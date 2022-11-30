@@ -22,6 +22,7 @@ from keep_alive import keep_alive
 
 #enable discord intents
 intents = discord.Intents.all()
+#create bot client
 client = commands.AutoShardedBot(command_prefix=";", help_command = None, intents = intents)
 
 
@@ -33,7 +34,7 @@ async def get_time():
 #bot activity and login message
 @client.event
 async def on_ready():
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('VGS'))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('/help'))
     print('We have logged in as {0.user}'.format(client))
     print(str(await get_time()))
     try:
@@ -53,11 +54,16 @@ async def on_message(message):
 @client.tree.command(name="help", description="Shows command list")
 async def help(interaction: discord.Interaction):
   
+  #help command list for members
   member_help = "/help - shows command list\n\n/register_self - register yourself as a member\n\n/unregister_self - unregister yourself as a member\n\n/my_xp - check your xp\n\n/list_ids - list ids of all members in a comittee\n\n"
-  
+  #help command list for admins
   admin_help = "/help - shows command list\n\n/register_member - register a member\n\n/unregister_member - unregister a member\n\n/register_self - register yourself as a member\n\n/unregister_self - unregister yourself as a member\n\n/my_xp - check your xp\n\n/commitee_report - see a report about commitee\n\n/list_ids - list ids of all members in a comittee\n\n"
+  #set admin_role as "Upper Board" role
   admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+  #set tech_role as technician role
   tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+  
+  #check if user is admin/tech or regular member and set the correct help message
   if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
     help_string = admin_help
   else:
@@ -95,6 +101,7 @@ async def committee(interaction: discord.Interaction, committee: str):
     await interaction.response.defer()
     await asyncio.sleep(1)
 
+    #get the time and fix the format for file saving
     datetime = await get_time()
     datetime = datetime.replace(" ", "-")
     datetime = datetime.replace(":", ".")
@@ -108,11 +115,11 @@ async def committee(interaction: discord.Interaction, committee: str):
     if report is None:
         msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
     else:
-        with open(r"D:\Code\vgs-test\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+        with open(r"C:\[OG]\SERVER\VGS\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
             file.write(report)
 
     try:
-        file=discord.File(r"D:\Code\vgs-test\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+        file=discord.File(r"C:\[OG]\SERVER\VGS\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
         #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(file=file)
     except Exception as exc:
@@ -196,6 +203,7 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
     msg = ""
     
     try:
+        #set member_user as the member object from the input member_mention
         member_user = member_mention
     except IndexError:
         msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
@@ -226,6 +234,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
     msg = ""
     
     try:
+        #set member_user as the member object from the input member_mention
         member_user = member_mention
     except IndexError:
         msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
