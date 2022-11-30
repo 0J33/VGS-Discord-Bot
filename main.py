@@ -1,31 +1,13 @@
 import asyncio
-import os
-import re
-import sys
-import tracemalloc
+#import os
+#import re
+#import sys
 import discord
 from discord import app_commands
 from discord.ext import commands
-import random
-import requests
-import json
-import seaborn as sns
-from matplotlib import pyplot as plt
-import matplotlib.pyplot as plt
-import pandas as pd
-from timple.timedelta import strftimedelta
-from matplotlib.colors import ListedColormap
-from matplotlib.collections import LineCollection
-from matplotlib import cm
-import numpy as np
-import matplotlib as mpl
-from matplotlib.ticker import MaxNLocator
-import matplotlib.font_manager as fm
 from time import time, ctime
-from datetime import datetime
-import datetime
-from matplotlib import dates
-mpl.use('Agg')
+#from datetime import datetime
+#import datetime
 
 import gspread
 #from dotenv import load_dotenv
