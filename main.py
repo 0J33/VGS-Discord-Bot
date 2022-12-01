@@ -8,6 +8,7 @@ from discord.ext import commands
 from time import time, ctime
 #from datetime import datetime
 #import datetime
+import pathlib
 
 import gspread
 #from dotenv import load_dotenv
@@ -30,6 +31,40 @@ client = commands.AutoShardedBot(command_prefix=";", help_command = None, intent
 #get the time
 async def get_time():
   return ctime(time())
+
+#method that logs data from slash commands
+async def log(interaction, message):
+    #get the time
+    datetime = await get_time()
+    
+    #if user has discriminator with zeros in the beginning add them again to the str after converting to int
+    zeros = ""
+    num = int(interaction.user.discriminator)
+    while(num<1000):
+        zeros = zeros + "0"
+        num = num * 10
+    #log the command used
+    testf = open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\logs.txt","a")
+    testf.write('{}'.format(interaction.user.name) + "#" + zeros + '{}'.format(int(interaction.user.discriminator)) + "\n" + str(message) + "\n" + str(datetime) + "\n\n")
+    testf.close()
+
+#method that handles exception messages
+async def excp(interaction, message, exc):
+    #get the time
+    datetime = await get_time()
+    
+    #if user has discriminator with zeros in the beginning add them again to the str after converting to int
+    zeros = ""
+    num = int(interaction.user.discriminator)
+    while(num<1000):
+        zeros = zeros + "0"
+        num = num * 10
+    
+    #log the command and exception
+    excf = open(r"" + str(pathlib.Path(__file__).parent.resolve())+ "\\exc.txt","a")
+    excf.write('{}'.format(interaction.user.name) + "#" + zeros + '{}'.format(int(interaction.user.discriminator)) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
+    excf.close()
+    return
 
 #bot activity and login message
 @client.event
@@ -55,6 +90,8 @@ async def on_message(message):
 
 @client.tree.command(name="help", description="Shows command list")
 async def help(interaction: discord.Interaction):
+  
+  await log(interaction, "/help")
   
   #help command list for members
   member_help = "/help - shows command list\n\n/register_self - register yourself as a member\n\n/unregister_self - unregister yourself as a member\n\n/my_xp - check your xp\n\n/list_ids - list ids of all members in a comittee\n\n"
@@ -82,6 +119,8 @@ async def my_xp(interaction: discord.Interaction):
     await interaction.response.defer()
     await asyncio.sleep(1)
 
+    await log(interaction, "/my_xp")
+    
     msg = ""
 
     member = members_spreadsheet.find_member_discord(interaction.user.id)
@@ -95,6 +134,7 @@ async def my_xp(interaction: discord.Interaction):
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/my_xp", exc)
         
 @client.tree.command(name="committee_report", description="See a report about committee")
 @app_commands.describe(committee = "Enter a committee")
@@ -103,6 +143,8 @@ async def committee(interaction: discord.Interaction, committee: str):
     await interaction.response.defer()
     await asyncio.sleep(1)
 
+    await log(interaction, "/commitee_report " + str(committee))
+    
     #get the time and fix the format for file saving
     datetime = await get_time()
     datetime = datetime.replace(" ", "-")
@@ -117,15 +159,16 @@ async def committee(interaction: discord.Interaction, committee: str):
     if report is None:
         msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
     else:
-        with open(r"C:\[OG]\SERVER\VGS\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+        with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
             file.write(report)
 
     try:
-        file=discord.File(r"C:\[OG]\SERVER\VGS\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+        file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
         #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(file=file)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/commitee_report " + str(committee), exc)
 
 @client.tree.command(name="list_ids", description="list ids of all members in a comittee")
 @app_commands.describe(committee = "Enter a committee")
@@ -133,6 +176,8 @@ async def list_ids(interaction: discord.Interaction, committee: str):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    await log(interaction, "/list_ids " + str(committee))
 
     msg = ""
     embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -148,6 +193,7 @@ async def list_ids(interaction: discord.Interaction, committee: str):
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/list_ids " + str(committee), exc)
   
 @client.tree.command(name="register_self", description="Register yourself as a member")
 @app_commands.describe(member_id = "Enter your member id")
@@ -155,6 +201,8 @@ async def register_self(interaction: discord.Interaction, member_id: str):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    await log(interaction, "/register_self " + str(member_id))
 
     msg = ""
     
@@ -174,12 +222,15 @@ async def register_self(interaction: discord.Interaction, member_id: str):
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/register_self " + str(member_id), exc)
    
 @client.tree.command(name="unregister_self", description="Unregister yourself as a member")
 async def unregister_self(interaction: discord.Interaction):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    await log(interaction, "/unregister_self")
 
     msg = ""
     
@@ -194,6 +245,7 @@ async def unregister_self(interaction: discord.Interaction):
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/unregister_self", exc)
    
 @client.tree.command(name="register_member", description="Register a member")
 @app_commands.describe(member_id = "Enter a member id", member_mention = "Mention a member")
@@ -201,6 +253,8 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    await log(interaction, "/register_member " + str(member_id) + " " + str(member_mention.id))
 
     msg = ""
     
@@ -236,6 +290,7 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/register_member " + str(member_id) + " " + str(member_mention.id), exc)
    
 @client.tree.command(name="unregister_member", description="Unregister a member")
 @app_commands.describe(member_mention = "Mention a member")
@@ -243,6 +298,8 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+
+    await log(interaction, "/unregister_member " + str(member_mention.id))
 
     msg = ""
     
@@ -275,6 +332,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        exc(interaction, "/unregister_member " + str(member_mention.id), exc)
    
 
 
