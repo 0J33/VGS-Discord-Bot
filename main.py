@@ -204,21 +204,32 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
 
     msg = ""
     
-    try:
-        #set member_user as the member object from the input member_mention
-        member_user = member_mention
-    except IndexError:
-        msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
-        return
+    #set admin_role as "Upper Board" role
+    admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+    #set tech_role as technician role
+    tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+    
+    #check if user is admin/tech or regular member and set the correct help message    
+    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+    
+        try:
+            #set member_user as the member object from the input member_mention
+            member_user = member_mention
+        except IndexError:
+            msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
+            return
 
-    exit_code = members_spreadsheet.register(
-        member_id, member_user.id, True)
-    if exit_code == 0:
-        msg = f"Hi {interaction.user.mention}!\nMember is now registered with the ID {member_id}!"
-    elif exit_code == 1:
-        msg = f"Hi {interaction.user.mention}!\nMember is already registered with this ID"
+        exit_code = members_spreadsheet.register(
+            member_id, member_user.id, True)
+        if exit_code == 0:
+            msg = f"Hi {interaction.user.mention}!\nMember is now registered with the ID {member_id}!"
+        elif exit_code == 1:
+            msg = f"Hi {interaction.user.mention}!\nMember is already registered with this ID"
+        else:
+            msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find the correct ID!"
+            
     else:
-        msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find the correct ID!"
+        msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
 
     try:
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -235,18 +246,29 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
 
     msg = ""
     
-    try:
-        #set member_user as the member object from the input member_mention
-        member_user = member_mention
-    except IndexError:
-        msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
-        return
+   #set admin_role as "Upper Board" role
+    admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+    #set tech_role as technician role
+    tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+    
+    #check if user is admin/tech or regular member and set the correct help message    
+    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        
+        try:
+            #set member_user as the member object from the input member_mention
+            member_user = member_mention
+        except IndexError:
+            msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
+            return
 
-    exit_code = members_spreadsheet.unregister(member_user.id)
-    if exit_code == 0:
-        msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
+        exit_code = members_spreadsheet.unregister(member_user.id)
+        if exit_code == 0:
+            msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
+        else:
+            msg = f"Hi {interaction.user.mention}!\nMember isn't registered in the first place!"
+            
     else:
-        msg = f"Hi {interaction.user.mention}!\nMember isn't registered in the first place!"
+        msg = f"Hi {interaction.user.mention}!\nYou don't have permission to use this command"
 
     try:
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
