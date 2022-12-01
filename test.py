@@ -29,3 +29,12 @@ async def test(interaction: discord.Interaction, test_input: str):
         await interaction.followup.send(file=file,embed=embed)
     except Exception as exc:
         print(exc)
+        # set the error message
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        # set the embed message
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        # send the response
+        await interaction.followup.send(embed=embed)
+        print(exc)
+        # log exception
+        exc(interaction, "/command" + command_input, exc)
