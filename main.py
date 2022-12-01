@@ -34,10 +34,12 @@ async def get_time():
 #bot activity and login message
 @client.event
 async def on_ready():
+    #change the bot status
     await client.change_presence(status=discord.Status.online, activity=discord.Game('/help'))
+    #print login message
     print('We have logged in as {0.user}'.format(client))
-    print(str(await get_time()))
     try:
+      #sync the commands and print number of synced commands
       synced = await client.tree.sync()
       print(f"Synced {len(synced)} command(s)")
     except Exception as exc:
