@@ -129,14 +129,14 @@ async def my_xp(interaction: discord.Interaction):
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
             msg = members_spreadsheet.calc_xp_report(member['id'])
-    except:
-        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
-
-    try:
+        
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         exc(interaction, "/my_xp", exc)
         
 @client.tree.command(name="committee_report", description="See a report about committee")
