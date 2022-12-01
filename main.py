@@ -123,11 +123,14 @@ async def my_xp(interaction: discord.Interaction):
     
     msg = ""
 
-    member = members_spreadsheet.find_member_discord(interaction.user.id)
-    if member is None:
-        msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
-    else:
-        msg = members_spreadsheet.calc_xp_report(member['id'])
+    try:
+        member = members_spreadsheet.find_member_discord(interaction.user.id)
+        if member is None:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
+        else:
+            msg = members_spreadsheet.calc_xp_report(member['id'])
+    except:
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
 
     try:
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -152,21 +155,29 @@ async def committee(interaction: discord.Interaction, committee: str):
 
     msg = ""
     
-    if committee is None:
-        msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD]\nexample: /committee_report CL"
-
-    report = members_spreadsheet.get_committee_report(committee)
-    if report is None:
-        msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
-    else:
-        with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
-            file.write(report)
-
     try:
-        file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
-        #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-        await interaction.followup.send(file=file)
+        if committee is None:
+            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD]\nexample: /committee_report CL"
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+        else: 
+            report = members_spreadsheet.get_committee_report(committee)
+            if report is None:
+                msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                await interaction.followup.send(embed=embed)
+            else:
+                with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+                    file.write(report)
+                file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+                #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+                await interaction.followup.send(file=file)
+
+        
     except Exception as exc:
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         print(exc)
         exc(interaction, "/commitee_report " + str(committee), exc)
 
@@ -180,19 +191,19 @@ async def list_ids(interaction: discord.Interaction, committee: str):
     await log(interaction, "/list_ids " + str(committee))
 
     msg = ""
-    embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-    
-    if (ids := members_spreadsheet.list_ids(committee)) is not None:
-        embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
-    else:
-        msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
-        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
 
-    try:
-        #embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-        await interaction.followup.send(embed=embed)
+    try:    
+        if (ids := members_spreadsheet.list_ids(committee)) is not None:
+            embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
+        else:
+            msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         exc(interaction, "/list_ids " + str(committee), exc)
   
 @client.tree.command(name="register_self", description="Register yourself as a member")
@@ -206,21 +217,25 @@ async def register_self(interaction: discord.Interaction, member_id: str):
 
     msg = ""
     
-    exit_code = members_spreadsheet.register(
-        member_id, interaction.user.id, False)
-    if exit_code == 0:
-        msg = f"Hi {interaction.user.mention}!\nYou are now registered with the ID {member_id}!"
-    elif exit_code == 1:
-        msg = f"Hi {interaction.user.mention}!\nYou are already registered , you'll have to unregister before registering again."
-    elif exit_code == 2:
-        msg = f"Hi {interaction.user.mention}!\nThis ID is already taken, if you believe it's yours please contact your supervisor."
-    else:
-        msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find your correct ID!"
-
     try:
+        
+        exit_code = members_spreadsheet.register(
+            member_id, interaction.user.id, False)
+        if exit_code == 0:
+            msg = f"Hi {interaction.user.mention}!\nYou are now registered with the ID {member_id}!"
+        elif exit_code == 1:
+            msg = f"Hi {interaction.user.mention}!\nYou are already registered , you'll have to unregister before registering again."
+        elif exit_code == 2:
+            msg = f"Hi {interaction.user.mention}!\nThis ID is already taken, if you believe it's yours please contact your supervisor."
+        else:
+            msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find your correct ID!"
+
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
     except Exception as exc:
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         print(exc)
         exc(interaction, "/register_self " + str(member_id), exc)
    
@@ -234,17 +249,21 @@ async def unregister_self(interaction: discord.Interaction):
 
     msg = ""
     
-    exit_code = members_spreadsheet.unregister(interaction.user.id)
-    if exit_code == 0:
-        msg = f"Hi {interaction.user.mention}!\nYou have been successfully unregistered!"
-    else:
-        msg = f"Hi {interaction.user.mention}!\nYou are not registered in the first place!"
-
     try:
+            
+        exit_code = members_spreadsheet.unregister(interaction.user.id)
+        if exit_code == 0:
+            msg = f"Hi {interaction.user.mention}!\nYou have been successfully unregistered!"
+        else:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered in the first place!"
+
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         exc(interaction, "/unregister_self", exc)
    
 @client.tree.command(name="register_member", description="Register a member")
@@ -258,38 +277,42 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
 
     msg = ""
     
-    #set admin_role as "Upper Board" role
-    admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
-    #set tech_role as technician role
-    tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
-    
-    #check if user is admin/tech or regular member and set the correct help message    
-    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
-    
-        try:
-            #set member_user as the member object from the input member_mention
-            member_user = member_mention
-        except IndexError:
-            msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
-            return
-
-        exit_code = members_spreadsheet.register(
-            member_id, member_user.id, True)
-        if exit_code == 0:
-            msg = f"Hi {interaction.user.mention}!\nMember is now registered with the ID {member_id}!"
-        elif exit_code == 1:
-            msg = f"Hi {interaction.user.mention}!\nMember is already registered with this ID"
-        else:
-            msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find the correct ID!"
-            
-    else:
-        msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
-
     try:
+    
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message    
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        
+            try:
+                #set member_user as the member object from the input member_mention
+                member_user = member_mention
+            except IndexError:
+                msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
+                return
+
+            exit_code = members_spreadsheet.register(
+                member_id, member_user.id, True)
+            if exit_code == 0:
+                msg = f"Hi {interaction.user.mention}!\nMember is now registered with the ID {member_id}!"
+            elif exit_code == 1:
+                msg = f"Hi {interaction.user.mention}!\nMember is already registered with this ID"
+            else:
+                msg = f"Hi {interaction.user.mention}!\nThere is no record of this ID, list IDs to find the correct ID!"
+                
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         exc(interaction, "/register_member " + str(member_id) + " " + str(member_mention.id), exc)
    
 @client.tree.command(name="unregister_member", description="Unregister a member")
@@ -303,35 +326,38 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
 
     msg = ""
     
-   #set admin_role as "Upper Board" role
-    admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
-    #set tech_role as technician role
-    tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
-    
-    #check if user is admin/tech or regular member and set the correct help message    
-    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
-        
-        try:
-            #set member_user as the member object from the input member_mention
-            member_user = member_mention
-        except IndexError:
-            msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
-            return
-
-        exit_code = members_spreadsheet.unregister(member_user.id)
-        if exit_code == 0:
-            msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
-        else:
-            msg = f"Hi {interaction.user.mention}!\nMember isn't registered in the first place!"
-            
-    else:
-        msg = f"Hi {interaction.user.mention}!\nYou don't have permission to use this command"
-
     try:
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message    
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            
+            try:
+                #set member_user as the member object from the input member_mention
+                member_user = member_mention
+            except IndexError:
+                msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
+                return
+
+            exit_code = members_spreadsheet.unregister(member_user.id)
+            if exit_code == 0:
+                msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
+            else:
+                msg = f"Hi {interaction.user.mention}!\nMember isn't registered in the first place!"
+                
+        else:
+            msg = f"Hi {interaction.user.mention}!\nYou don't have permission to use this command"
+
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
     except Exception as exc:
         print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
         exc(interaction, "/unregister_member " + str(member_mention.id), exc)
    
 
