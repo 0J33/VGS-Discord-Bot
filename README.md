@@ -1,1 +1,1 @@
-# VGS-discord-Bot 
+# VGS Discord Bot
