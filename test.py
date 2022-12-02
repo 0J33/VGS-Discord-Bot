@@ -1,3 +1,6 @@
+#command template
+'''
+
 # create new command
 @client.tree.command(name="test", description="test description")
 # if command has input
@@ -38,3 +41,5 @@ async def test(interaction: discord.Interaction, test_input: str):
         print(exc)
         # log exception
         exc(interaction, "/command" + command_input, exc)
+
+'''
