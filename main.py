@@ -124,6 +124,7 @@ async def my_xp(interaction: discord.Interaction):
     msg = ""
 
     try:
+        #look for the member using discord id, if member not registered error, else calc xp report and send it 
         member = members_spreadsheet.find_member_discord(interaction.user.id)
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
@@ -156,6 +157,7 @@ async def committee(interaction: discord.Interaction, committee: str):
     msg = ""
     
     try:
+        #if commitee empty or invalid then error, else calc commitee report and send it
         if committee is None:
             msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -193,6 +195,7 @@ async def list_ids(interaction: discord.Interaction, committee: str):
     msg = ""
 
     try:    
+        #if commitee invalid then error, else send members id from commitee
         if (ids := members_spreadsheet.list_ids(committee)) is not None:
             embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
         else:
@@ -219,6 +222,7 @@ async def register_self(interaction: discord.Interaction, member_id: str):
     
     try:
         
+        #register member or send error message
         exit_code = members_spreadsheet.register(
             member_id, interaction.user.id, False)
         if exit_code == 0:
@@ -250,7 +254,8 @@ async def unregister_self(interaction: discord.Interaction):
     msg = ""
     
     try:
-            
+        
+        #unregister member or send error message
         exit_code = members_spreadsheet.unregister(interaction.user.id)
         if exit_code == 0:
             msg = f"Hi {interaction.user.mention}!\nYou have been successfully unregistered!"
@@ -294,6 +299,7 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
                 msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
                 return
 
+            #register member or send error message
             exit_code = members_spreadsheet.register(
                 member_id, member_user.id, True)
             if exit_code == 0:
@@ -342,6 +348,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
                 msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
                 return
 
+            #unregister member or send error message
             exit_code = members_spreadsheet.unregister(member_user.id)
             if exit_code == 0:
                 msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
