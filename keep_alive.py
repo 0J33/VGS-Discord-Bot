@@ -13,6 +13,3 @@ def run():
 def keep_alive():
     t = Thread(target=run)
     t.start()
-    
-if __name__ == '__main__':
-    app.run()
