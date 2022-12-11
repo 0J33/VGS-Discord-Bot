@@ -197,7 +197,9 @@ async def list_ids(interaction: discord.Interaction, committee: str):
     try:    
         #if commitee invalid then error, else send members id from commitee
         if (ids := members_spreadsheet.list_ids(committee)) is not None:
+            embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
+            await interaction.followup.send(embed=embed)
         else:
             msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
