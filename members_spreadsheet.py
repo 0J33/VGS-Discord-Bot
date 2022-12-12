@@ -191,7 +191,7 @@ def get_leaderboard(committee_name):
   # Reverse the order of the members array to sort by descending xp
   members.reverse()
 
-  # Create a table with the members' data
+# Create a table with the members' data
   table = []
   for i, member in enumerate(members):
     table.append([i + 1, member["id"], member["name"], member["xp"]])
