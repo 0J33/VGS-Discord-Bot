@@ -151,3 +151,53 @@ def get_committee_report(committee):
         return report
     except gspread.exceptions.WorksheetNotFound:
         return None
+    
+from tabulate import tabulate    
+
+def calc_xp_report_helper_leaderboard(member_id, xp_ws):
+    xp = 0
+    total_xp = 0
+    attendance = 0
+    report = ""
+
+    worksheet = xp_ws
+    for response in worksheet:
+        response = [s for s in response if s]
+        if str(member_id) in response[4]:
+            reason = response[5] # increase in xp
+            if "Attendance" in reason:
+                attendance += 1
+            xp = int(reason[reason.find("[")+1:reason.find("XP]")])
+            total_xp += xp
+            justification = response[6] # justification
+            report += f"{justification}: {xp}XP\n"
+
+    report += f"--------\nAttended {attendance} sessions/meetings\n"
+    report += f"Total XP is {total_xp}\n\n\n"
+    return total_xp
+
+def get_leaderboard(committee_name):
+  # Get the first worksheet in the members spreadsheet
+  sheet = sh_members.worksheet(committee_name)
+
+  # Create an array of member objects with their ids, names, and xp values
+  members = []
+  for row in sheet.get_all_values():
+    members.append({"id": row[0], "name": row[1], "xp": calc_xp_report_helper_leaderboard(row[0], sh_xp.worksheet("Form Responses 1").get_all_values())})
+
+  # Sort the members array by ascending xp
+  members.sort(key=lambda x: x["xp"])
+
+  # Reverse the order of the members array to sort by descending xp
+  members.reverse()
+
+  # Create a table with the members' data
+  table = []
+  for member in members:
+    table.append([member["name"], member["xp"]])
+
+  # Return the table as a string
+  return tabulate(table, headers=["Name", "XP"], tablefmt="grid")
+
+# Test the method
+print(get_leaderboard("LIT"))

@@ -368,7 +368,36 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
         exc(interaction, "/unregister_member " + str(member_mention.id), exc)
-   
+
+@client.tree.command(name="leaderboard", description="Check the leaderboard")
+@app_commands.describe(committee = "Enter a committee")
+async def leaderboard(interaction: discord.Interaction, committee: str):
+
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    await log(interaction, "/leaderboard")
+    
+    msg = ""
+
+    try:
+        #look for the member using discord id, if member not registered error, else calc xp report and send it 
+        member = members_spreadsheet.find_member_discord(interaction.user.id)
+        if member is None:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
+        else:
+            msg = "`" + members_spreadsheet.get_leaderboard(committee) + "`"
+        
+        embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+        embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
+        await interaction.followup.send(embed=embed)
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/leaderboard", exc)
+ 
 
 
 #keep the bot alive
