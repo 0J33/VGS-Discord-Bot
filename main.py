@@ -159,7 +159,7 @@ async def committee(interaction: discord.Interaction, committee: str):
     try:
         #if commitee empty or invalid then error, else calc commitee report and send it
         if committee is None:
-            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD]\nexample: /committee_report CL"
+            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD] [LIT] [GSD] [EP]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
