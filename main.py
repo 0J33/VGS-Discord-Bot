@@ -147,7 +147,7 @@ async def committee(interaction: discord.Interaction, committee: str):
     await interaction.response.defer()
     await asyncio.sleep(1)
 
-    await log(interaction, "/commitee_report " + str(committee))
+    await log(interaction, "/commitee_report " + str(committee.upper()))
     
     #get the time and fix the format for file saving
     datetime = await get_time()
@@ -158,14 +158,14 @@ async def committee(interaction: discord.Interaction, committee: str):
     
     try:
         #if commitee empty or invalid then error, else calc commitee report and send it
-        if committee is None:
+        if committee.upper() is None:
             msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD] [LIT] [GSD] [EP]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
-            report = members_spreadsheet.get_committee_report(committee)
+            report = members_spreadsheet.get_committee_report(committee.upper())
             if report is None:
-                msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
+                msg = f"Hi {interaction.user.mention}!\n{committee.upper()} is not a valid committee"
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await interaction.followup.send(embed=embed)
             else:
@@ -190,18 +190,18 @@ async def list_ids(interaction: discord.Interaction, committee: str):
     await interaction.response.defer()
     await asyncio.sleep(1)
     
-    await log(interaction, "/list_ids " + str(committee))
+    await log(interaction, "/list_ids " + str(committee.upper()))
 
     msg = ""
 
     try:    
         #if commitee invalid then error, else send members id from commitee
-        if (ids := members_spreadsheet.list_ids(committee)) is not None:
+        if (ids := members_spreadsheet.list_ids(committee.upper())) is not None:
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
+            embed.add_field(name=f"{committee.upper()} Members:\n", value=ids, inline=False)
             await interaction.followup.send(embed=embed)
         else:
-            msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
+            msg = f"Hi {interaction.user.mention}!\n{committee.upper()} is not a valid committee"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
     except Exception as exc:
@@ -378,6 +378,11 @@ async def leaderboard(interaction: discord.Interaction, committee: str):
 
     await log(interaction, "/leaderboard")
     
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
     msg = ""
 
     try:
@@ -386,11 +391,16 @@ async def leaderboard(interaction: discord.Interaction, committee: str):
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
-            msg = "`" + members_spreadsheet.get_leaderboard(committee) + "`"
+            msg = members_spreadsheet.get_leaderboard(committee.upper())
         
         embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-        embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-        await interaction.followup.send(embed=embed)
+        # embed.add_field(name=f"{committee.upper()} Leaderboard:\n", value=msg, inline=False)
+        # await interaction.followup.send(embed=embed)
+        with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+            file.write(msg)
+        file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+        #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(file=file)
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
