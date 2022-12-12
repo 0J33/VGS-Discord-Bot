@@ -194,10 +194,7 @@ def get_leaderboard(committee_name):
   # Create a table with the members' data
   table = []
   for member in members:
-    table.append([member["name"], member["xp"]])
+    table.append([member["id"], member["name"], member["xp"]])
 
   # Return the table as a string
-  return tabulate(table, headers=["Name", "XP"], tablefmt="grid")
-
-# Test the method
-print(get_leaderboard("LIT"))
+  return tabulate(table, headers=["ID", "Name", "XP"], tablefmt="grid")
