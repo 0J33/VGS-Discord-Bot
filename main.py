@@ -141,7 +141,7 @@ async def my_xp(interaction: discord.Interaction):
         exc(interaction, "/my_xp", exc)
         
 @client.tree.command(name="committee_report", description="See a report about committee")
-@app_commands.describe(committee = "Enter a committee")
+@app_commands.describe(committee = "Enter a committee ([BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD])")
 async def committee(interaction: discord.Interaction, committee: str):
 
     await interaction.response.defer()
@@ -159,7 +159,7 @@ async def committee(interaction: discord.Interaction, committee: str):
     try:
         #if commitee empty or invalid then error, else calc commitee report and send it
         if committee.upper() is None:
-            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [CL] [MRKT] [FR] [HR] [MD] [LIT] [GSD] [EP]\nexample: /committee_report CL"
+            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
@@ -184,7 +184,7 @@ async def committee(interaction: discord.Interaction, committee: str):
         exc(interaction, "/commitee_report " + str(committee), exc)
 
 @client.tree.command(name="list_ids", description="list ids of all members in a comittee")
-@app_commands.describe(committee = "Enter a committee")
+@app_commands.describe(committee = "Enter a committee ([BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD])")
 async def list_ids(interaction: discord.Interaction, committee: str):
 
     await interaction.response.defer()
@@ -370,7 +370,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         exc(interaction, "/unregister_member " + str(member_mention.id), exc)
 
 @client.tree.command(name="leaderboard", description="Check the leaderboard")
-@app_commands.describe(committee = "Enter a committee")
+@app_commands.describe(committee = "Enter a committee [BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]")
 async def leaderboard(interaction: discord.Interaction, committee: str):
 
     await interaction.response.defer()
