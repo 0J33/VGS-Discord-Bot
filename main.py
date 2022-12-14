@@ -141,13 +141,27 @@ async def my_xp(interaction: discord.Interaction):
         exc(interaction, "/my_xp", exc)
         
 @client.tree.command(name="committee_report", description="See a report about committee")
-@app_commands.describe(committee = "Enter a committee ([BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD])")
-async def committee(interaction: discord.Interaction, committee: str):
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="LIT", value=2),
+    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="EP", value=7),
+    discord.app_commands.Choice(name="GAD", value=8),
+    discord.app_commands.Choice(name="GDD", value=9),
+    discord.app_commands.Choice(name="GSD", value=10)
+])
+async def committee(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    committee = committee.name
 
-    await log(interaction, "/commitee_report " + str(committee.upper()))
+    await log(interaction, "/commitee_report " + str(committee))
     
     #get the time and fix the format for file saving
     datetime = await get_time()
@@ -158,14 +172,14 @@ async def committee(interaction: discord.Interaction, committee: str):
     
     try:
         #if commitee empty or invalid then error, else calc commitee report and send it
-        if committee.upper() is None:
+        if committee is None:
             msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
-            report = members_spreadsheet.get_committee_report(committee.upper())
+            report = members_spreadsheet.get_committee_report(committee)
             if report is None:
-                msg = f"Hi {interaction.user.mention}!\n{committee.upper()} is not a valid committee"
+                msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await interaction.followup.send(embed=embed)
             else:
@@ -184,24 +198,38 @@ async def committee(interaction: discord.Interaction, committee: str):
         exc(interaction, "/commitee_report " + str(committee), exc)
 
 @client.tree.command(name="list_ids", description="list ids of all members in a comittee")
-@app_commands.describe(committee = "Enter a committee ([BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD])")
-async def list_ids(interaction: discord.Interaction, committee: str):
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="LIT", value=2),
+    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="EP", value=7),
+    discord.app_commands.Choice(name="GAD", value=8),
+    discord.app_commands.Choice(name="GDD", value=9),
+    discord.app_commands.Choice(name="GSD", value=10)
+])
+async def list_ids(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
     
-    await log(interaction, "/list_ids " + str(committee.upper()))
+    committee = committee.name
+    
+    await log(interaction, "/list_ids " + str(committee))
 
     msg = ""
 
     try:    
         #if commitee invalid then error, else send members id from commitee
-        if (ids := members_spreadsheet.list_ids(committee.upper())) is not None:
+        if (ids := members_spreadsheet.list_ids(committee)) is not None:
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            embed.add_field(name=f"{committee.upper()} Members:\n", value=ids, inline=False)
+            embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
             await interaction.followup.send(embed=embed)
         else:
-            msg = f"Hi {interaction.user.mention}!\n{committee.upper()} is not a valid committee"
+            msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
     except Exception as exc:
@@ -370,11 +398,25 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         exc(interaction, "/unregister_member " + str(member_mention.id), exc)
 
 @client.tree.command(name="leaderboard", description="Check the leaderboard")
-@app_commands.describe(committee = "Enter a committee [BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]")
-async def leaderboard(interaction: discord.Interaction, committee: str):
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="LIT", value=2),
+    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="EP", value=7),
+    discord.app_commands.Choice(name="GAD", value=8),
+    discord.app_commands.Choice(name="GDD", value=9),
+    discord.app_commands.Choice(name="GSD", value=10)
+])
+async def leaderboard(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
+    
+    committee = committee.name
 
     await log(interaction, "/leaderboard")
     
@@ -391,10 +433,10 @@ async def leaderboard(interaction: discord.Interaction, committee: str):
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
-            msg = members_spreadsheet.get_leaderboard(committee.upper())
+            msg = members_spreadsheet.get_leaderboard(committee)
         
         embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-        # embed.add_field(name=f"{committee.upper()} Leaderboard:\n", value=msg, inline=False)
+        # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
         # await interaction.followup.send(embed=embed)
         with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
             file.write(msg)
