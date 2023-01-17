@@ -94,9 +94,20 @@ async def help(interaction: discord.Interaction):
   await log(interaction, "/help")
   
   #help command list for members
-  member_help = "/help - shows command list\n\n/register_self - register yourself as a member\n\n/unregister_self - unregister yourself as a member\n\n/my_xp - check your xp\n\n/list_ids - list ids of all members in a comittee\n\n"
+  member_help = """**/help**\nshows command list\n
+  **/register_self**\nregister yourself as a member\n
+  **/unregister_self**\nunregister yourself as a member\n
+  **/my_xp**\ncheck your xp\n
+  **/list_ids**\nlist ids of all members in a comittee"""
   #help command list for admins
-  admin_help = "/help - shows command list\n\n/register_member - register a member\n\n/unregister_member - unregister a member\n\n/register_self - register yourself as a member\n\n/unregister_self - unregister yourself as a member\n\n/my_xp - check your xp\n\n/commitee_report - see a report about commitee\n\n/list_ids - list ids of all members in a comittee\n\n"
+  admin_help = """/help**\nshows command list\n
+  **/register_member**\nregister a member\n
+  **/unregister_member**\nunregister a member\n
+  **/register_self**\nregister yourself as a member\n
+  **/unregister_self**\nunregister yourself as a member\n
+  **/my_xp**\ncheck your xp\n
+  **/commitee_report**\nsee a report about commitee\n
+  **/list_ids**\nlist ids of all members in a comittee"""
   #set admin_role as "Upper Board" role
   admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
   #set tech_role as technician role
