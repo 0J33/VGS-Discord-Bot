@@ -1,5 +1,5 @@
 import asyncio
-#import os
+import os
 #import re
 #import sys
 import discord
@@ -188,7 +188,8 @@ async def committee(interaction: discord.Interaction, committee: discord.app_com
                 file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
                 #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
                 await interaction.followup.send(file=file)
-
+                file.close()
+                os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt")
         
     except Exception as exc:
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
