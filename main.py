@@ -100,7 +100,7 @@ async def help(interaction: discord.Interaction):
   **/my_xp**\ncheck your xp\n
   **/list_ids**\nlist ids of all members in a comittee"""
   #help command list for admins
-  admin_help = """/help**\nshows command list\n
+  admin_help = """**/help**\nshows command list\n
   **/register_member**\nregister a member\n
   **/unregister_member**\nunregister a member\n
   **/register_self**\nregister yourself as a member\n
