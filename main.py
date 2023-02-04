@@ -17,7 +17,10 @@ import members_spreadsheet
 
 from env import str_TOKEN
 #bot token
-TOKEN = str_TOKEN
+try:
+    TOKEN = str_TOKEN
+except:
+    str_TOKEN = os.getenv("TOKEN")
 #keep bot alive
 from keep_alive import keep_alive
 
