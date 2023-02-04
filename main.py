@@ -15,12 +15,13 @@ import gspread
 #load_dotenv()
 import members_spreadsheet
 
-from env import str_TOKEN
+
 #bot token
 try:
+    from env import str_TOKEN
     TOKEN = str_TOKEN
 except:
-    str_TOKEN = os.getenv("TOKEN")
+    TOKEN = os.getenv("TOKEN")
 #keep bot alive
 from keep_alive import keep_alive
 
