@@ -74,7 +74,7 @@ async def excp(interaction, message, exc):
 @client.event
 async def on_ready():
     #change the bot status
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('/help'))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('/help • vgsguc.ga'))
     #print login message
     print('We have logged in as {0.user}'.format(client))
     try:
