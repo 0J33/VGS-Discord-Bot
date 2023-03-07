@@ -2,6 +2,8 @@ import gspread
 import os
 #from dotenv import load_dotenv
 #load_dotenv()
+    
+from tabulate import tabulate
 
 #get env vars from env.py (.env not working)
 try:
@@ -162,9 +164,7 @@ def get_committee_report(committee):
             report += calc_xp_report_helper(member[0], xp_ws)
         return report
     except gspread.exceptions.WorksheetNotFound:
-        return None
-    
-from tabulate import tabulate    
+        return None    
 
 def calc_xp_report_helper_leaderboard(member_id, xp_ws):
     xp = 0
@@ -210,3 +210,33 @@ def get_leaderboard(committee_name):
 
   # Return the table as a string
   return tabulate(table, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+
+# def get_leaderboard_all():
+    
+#     members = []
+#     committees = ["BOARD","LIT","MRKT","FR","HR","MD","EP","GAD","GDD","GSD"]
+    
+#     for committee_name in committees: 
+#         # Get the first worksheet in the members spreadsheet
+#         sheet = sh_members.worksheet(committee_name)
+
+#         # Create an array of member objects with their ids, names, and xp values
+
+#         for row in sheet.get_all_values():
+#             members.append({"id": row[0], "name": row[1], "xp": calc_xp_report_helper_leaderboard(row[0], sh_xp.worksheet("Form Responses 1").get_all_values())})
+
+#     # Sort the members array by ascending xp
+#     members.sort(key=lambda x: x["xp"])
+
+#     # Reverse the order of the members array to sort by descending xp
+#     members.reverse()
+
+#     # Create a table with the members' data
+#     table = []
+#     for i, member in enumerate(members):
+#         table.append([i + 1, member["id"], member["name"], member["xp"]])
+
+#     # Return the table as a string
+#     return tabulate(table, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+
+# print(get_leaderboard_all())
