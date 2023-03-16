@@ -448,17 +448,18 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
         member = members_spreadsheet.find_member_discord(interaction.user.id)
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
         else:
             msg = members_spreadsheet.get_leaderboard(committee)
-        
-        embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-        # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-        # await interaction.followup.send(embed=embed)
-        with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
-            file.write(msg)
-        file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
-        #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-        await interaction.followup.send(file=file)
+            embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
+            # await interaction.followup.send(embed=embed)
+            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+                file.write(msg)
+            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(file=file)
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
@@ -481,14 +482,15 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
     
 #     msg = ""
 
-#     try:
-#         #look for the member using discord id, if member not registered error, else calc xp report and send it 
-#         member = members_spreadsheet.find_member_discord(interaction.user.id)
-#         if member is None:
-#             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
-#         else:
-#             msg = members_spreadsheet.get_leaderboard_all()
-        
+# try:
+#     #look for the member using discord id, if member not registered error, else calc xp report and send it 
+#     member = members_spreadsheet.find_member_discord(interaction.user.id)
+#     if member is None:
+#         msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
+#         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+#         await interaction.followup.send(embed=embed)
+#     else:
+#         msg = members_spreadsheet.get_leaderboard_all()
 #         embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
 #         # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
 #         # await interaction.followup.send(embed=embed)
