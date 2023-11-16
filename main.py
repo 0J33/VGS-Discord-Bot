@@ -40,33 +40,18 @@ async def get_time():
 async def log(interaction, message):
     #get the time
     datetime = await get_time()
-    
-    #if user has discriminator with zeros in the beginning add them again to the str after converting to int
-    zeros = ""
-    num = int(interaction.user.discriminator)
-    while(num<1000):
-        zeros = zeros + "0"
-        num = num * 10
     #log the command used
     testf = open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\logs.txt","a")
-    testf.write('{}'.format(interaction.user.name) + "#" + zeros + '{}'.format(int(interaction.user.discriminator)) + "\n" + str(message) + "\n" + str(datetime) + "\n\n")
+    testf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(datetime) + "\n\n")
     testf.close()
 
 #method that handles exception messages
 async def excp(interaction, message, exc):
     #get the time
     datetime = await get_time()
-    
-    #if user has discriminator with zeros in the beginning add them again to the str after converting to int
-    zeros = ""
-    num = int(interaction.user.discriminator)
-    while(num<1000):
-        zeros = zeros + "0"
-        num = num * 10
-    
     #log the command and exception
     excf = open(r"" + str(pathlib.Path(__file__).parent.resolve())+ "\\exc.txt","a")
-    excf.write('{}'.format(interaction.user.name) + "#" + zeros + '{}'.format(int(interaction.user.discriminator)) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
+    excf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
     excf.close()
     return
 
