@@ -1,6 +1,6 @@
 import os
 from pymongo import MongoClient
-import tabulate
+from tabulate import tabulate
 
 try:
     from env import connection_string
@@ -114,4 +114,10 @@ def get_leaderboard_all():
         leaderboard.append([member["member_id"], member["name"], xp])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
+
+    for i, member in enumerate(leaderboard):
+        leaderboard[i].insert(0, i+1)
+    
     return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+
+print(get_leaderboard_all())
