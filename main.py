@@ -130,7 +130,7 @@ async def my_xp(interaction: discord.Interaction):
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
-            msg = mongo.calc_xp_report(member['id'])
+            msg = mongo.calc_xp_report(member['member_id'])
         
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
@@ -184,6 +184,7 @@ async def committee(interaction: discord.Interaction, committee: discord.app_com
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await interaction.followup.send(embed=embed)
             else:
+                os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\", exist_ok=True)
                 with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
                     file.write(report)
                 file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
@@ -446,6 +447,9 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
             file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
             #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(file=file)
+            file.close()
+            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt")
+            
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
@@ -480,18 +484,21 @@ async def leaderboard_all(interaction: discord.Interaction):
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
             # await interaction.followup.send(embed=embed)
-            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+            os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\", exist_ok=True)
+            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt", "w") as file:
                 file.write(msg)
-            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt", filename=str(datetime) + "_ALL" + ".txt")
             #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(file=file)
+            file.close()
+            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt")
             
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/leaderboard", exc)
+        exc(interaction, "/leaderboard_all", exc)
 
 
 

@@ -23,7 +23,11 @@ def find_member_discord(discord_id):
 def list_ids(committee_name):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
-    return members
+    members_parsed = "```"
+    for member in members:
+        members_parsed = members_parsed + member["member_id"] + "\t" + member["name"] + "\n"
+    members_parsed += "```"
+    return members_parsed
 
 def register(member_id, discord_id, admin):
     member = find_member_discord(discord_id)
@@ -119,5 +123,3 @@ def get_leaderboard_all():
         leaderboard[i].insert(0, i+1)
     
     return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
-
-print(get_leaderboard_all())
