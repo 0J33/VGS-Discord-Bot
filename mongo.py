@@ -107,6 +107,10 @@ def get_leaderboard(committee_name):
         leaderboard.append([member["member_id"], member["name"], xp])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
+
+    for i, member in enumerate(leaderboard):
+        leaderboard[i].insert(0, i+1)
+        
     return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
 
 def get_leaderboard_all():
