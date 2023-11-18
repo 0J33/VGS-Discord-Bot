@@ -64,7 +64,12 @@ def unregister(discord_id):
 
 def calc_xp_report(member_id):
     collection = db["xp"]
-    tasks = collection.find({"member_id": member_id})
+    all_tasks = collection.find({})
+    tasks = []
+    for task in all_tasks:
+        if member_id in task["member_ids"]:
+            tasks.append(task)
+    
     xp = 0
     attendance = 0
     report = ""
@@ -92,7 +97,12 @@ def calc_xp_report_leaderboard(member_id):
     xp = 0
     
     collection = db["xp"]
-    tasks = collection.find({"member_id": member_id})
+    all_tasks = collection.find({})
+    tasks = []
+    for task in all_tasks:
+        if member_id in task["member_ids"]:
+            tasks.append(task)
+    
     for task in tasks:
         xp += task["xp"]
         
@@ -127,3 +137,33 @@ def get_leaderboard_all():
         leaderboard[i].insert(0, i+1)
     
     return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+
+def add_task(authority, name, committee, member_ids, justification, xp, details):
+    collection = db["xp"]
+    collection.insert_one({"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details})
+    return 0
+
+def edit_task(task_id, authority, name, committee, member_ids, justification, xp, details):
+    collection = db["xp"]
+    collection.update_one({"_id": task_id}, {"$set": {"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details}})
+    return 0
+
+def delete_task(task_id):
+    collection = db["xp"]
+    collection.delete_one({"_id": task_id})
+    return 0
+
+def add_member(member_id, name, committee):
+    collection = db["members"]
+    collection.insert_one({"member_id": member_id, "name": name, "committee": committee})
+    return 0
+
+def edit_member(member_id, name, committee):
+    collection = db["members"]
+    collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
+    return 0
+
+def delete_member(member_id):
+    collection = db["members"]
+    collection.delete_one({"member_id": member_id})
+    return 0
