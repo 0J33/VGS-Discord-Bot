@@ -13,7 +13,8 @@ import pathlib
 import gspread
 #from dotenv import load_dotenv
 #load_dotenv()
-import members_spreadsheet
+# import mongo
+import mongo
 
 
 #bot token
@@ -125,11 +126,11 @@ async def my_xp(interaction: discord.Interaction):
 
     try:
         #look for the member using discord id, if member not registered error, else calc xp report and send it 
-        member = members_spreadsheet.find_member_discord(interaction.user.id)
+        member = mongo.find_member_discord(interaction.user.id)
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
-            msg = members_spreadsheet.calc_xp_report(member['id'])
+            msg = mongo.calc_xp_report(member['id'])
         
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
@@ -177,7 +178,7 @@ async def committee(interaction: discord.Interaction, committee: discord.app_com
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
-            report = members_spreadsheet.get_committee_report(committee)
+            report = mongo.get_committee_report(committee)
             if report is None:
                 msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -225,7 +226,7 @@ async def list_ids(interaction: discord.Interaction, committee: discord.app_comm
 
     try:    
         #if commitee invalid then error, else send members id from commitee
-        if (ids := members_spreadsheet.list_ids(committee)) is not None:
+        if (ids := mongo.list_ids(committee)) is not None:
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
             await interaction.followup.send(embed=embed)
@@ -254,7 +255,7 @@ async def register_self(interaction: discord.Interaction, member_id: str):
     try:
         
         #register member or send error message
-        exit_code = members_spreadsheet.register(
+        exit_code = mongo.register(
             member_id, interaction.user.id, False)
         if exit_code == 0:
             msg = f"Hi {interaction.user.mention}!\nYou are now registered with the ID {member_id}!"
@@ -287,7 +288,7 @@ async def unregister_self(interaction: discord.Interaction):
     try:
         
         #unregister member or send error message
-        exit_code = members_spreadsheet.unregister(interaction.user.id)
+        exit_code = mongo.unregister(interaction.user.id)
         if exit_code == 0:
             msg = f"Hi {interaction.user.mention}!\nYou have been successfully unregistered!"
         else:
@@ -331,7 +332,7 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
                 return
 
             #register member or send error message
-            exit_code = members_spreadsheet.register(
+            exit_code = mongo.register(
                 member_id, member_user.id, True)
             if exit_code == 0:
                 msg = f"Hi {interaction.user.mention}!\nMember is now registered with the ID {member_id}!"
@@ -380,7 +381,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
                 return
 
             #unregister member or send error message
-            exit_code = members_spreadsheet.unregister(member_user.id)
+            exit_code = mongo.unregister(member_user.id)
             if exit_code == 0:
                 msg = f"Hi {interaction.user.mention}!\nMember has been successfully unregistered!"
             else:
@@ -430,13 +431,13 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
 
     try:
         #look for the member using discord id, if member not registered error, else calc xp report and send it 
-        member = members_spreadsheet.find_member_discord(interaction.user.id)
+        member = mongo.find_member_discord(interaction.user.id)
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else:
-            msg = members_spreadsheet.get_leaderboard(committee)
+            msg = mongo.get_leaderboard(committee)
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
             # await interaction.followup.send(embed=embed)
@@ -452,45 +453,46 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
         await interaction.followup.send(embed=embed)
         exc(interaction, "/leaderboard", exc)
         
-# @client.tree.command(name="leaderboard_all", description="Check the leaderboard")
-# async def leaderboard_all(interaction: discord.Interaction):
+@client.tree.command(name="leaderboard_all", description="Check the leaderboard")
+async def leaderboard_all(interaction: discord.Interaction):
 
-#     await interaction.response.defer()
-#     await asyncio.sleep(1)
+    await interaction.response.defer()
+    await asyncio.sleep(1)
 
-#     await log(interaction, "/leaderboard_all")
+    await log(interaction, "/leaderboard_all")
     
-#     #get the time and fix the format for file saving
-#     datetime = await get_time()
-#     datetime = datetime.replace(" ", "-")
-#     datetime = datetime.replace(":", ".")
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
     
-#     msg = ""
+    msg = ""
 
-# try:
-#     #look for the member using discord id, if member not registered error, else calc xp report and send it 
-#     member = members_spreadsheet.find_member_discord(interaction.user.id)
-#     if member is None:
-#         msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
-#         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-#         await interaction.followup.send(embed=embed)
-#     else:
-#         msg = members_spreadsheet.get_leaderboard_all()
-#         embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-#         # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-#         # await interaction.followup.send(embed=embed)
-#         with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
-#             file.write(msg)
-#         file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
-#         #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-#         await interaction.followup.send(file=file)
-#     except Exception as exc:
-#         print(exc)
-#         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
-#         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-#         await interaction.followup.send(embed=embed)
-#         exc(interaction, "/leaderboard", exc)
- 
+    try:
+        #look for the member using discord id, if member not registered error, else calc xp report and send it 
+        member = mongo.find_member_discord(interaction.user.id)
+        if member is None:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+        else:
+            msg = mongo.get_leaderboard_all()
+            embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
+            # await interaction.followup.send(embed=embed)
+            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
+                file.write(msg)
+            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
+            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(file=file)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/leaderboard", exc)
+
 
 
 #keep the bot alive
