@@ -155,15 +155,24 @@ def delete_task(task_id):
 
 def add_member(member_id, name, committee):
     collection = db["members"]
-    collection.insert_one({"member_id": member_id, "name": name, "committee": committee})
-    return 0
+    if find_member(member_id) is not None:
+        return 1
+    else:
+        collection.insert_one({"member_id": member_id, "name": name, "committee": committee, "discord_id": None})
+        return 0
 
 def edit_member(member_id, name, committee):
     collection = db["members"]
-    collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
-    return 0
+    if find_member(member_id) is not None:
+        collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
+        return 1
+    else:
+        return 0
 
 def delete_member(member_id):
     collection = db["members"]
-    collection.delete_one({"member_id": member_id})
-    return 0
+    if find_member(member_id) is not None:
+        collection.delete_one({"member_id": member_id})
+        return 1
+    else:
+        return 0
