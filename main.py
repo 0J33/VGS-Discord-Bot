@@ -499,6 +499,133 @@ async def leaderboard_all(interaction: discord.Interaction):
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
         exc(interaction, "/leaderboard_all", exc)
+        
+@client.tree.command(name="add_member", description="Add a new member")
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="LIT", value=2),
+    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="EP", value=7),
+    discord.app_commands.Choice(name="GAD", value=8),
+    discord.app_commands.Choice(name="GDD", value=9),
+    discord.app_commands.Choice(name="GSD", value=10)
+])
+async def add_member(interaction: discord.Interaction, member_id: str, name: str, committee: discord.app_commands.Choice[int]):
+
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    committee = committee.name
+
+    await log(interaction, "/add_member")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        member = mongo.add_member(member_id, name, committee)
+        if member:
+            msg = f"Member {member_id} already exists."
+        else: 
+            msg = f"Member {member_id} added successfully!"
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/add_member", exc)
+        
+@client.tree.command(name="edit_member", description="Edit a member's details")
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="LIT", value=2),
+    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="EP", value=7),
+    discord.app_commands.Choice(name="GAD", value=8),
+    discord.app_commands.Choice(name="GDD", value=9),
+    discord.app_commands.Choice(name="GSD", value=10)
+])
+async def edit_member(interaction: discord.Interaction, member_id: str, name: str = None, committee: discord.app_commands.Choice[int] = None):
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    committee = committee.name
+
+    await log(interaction, "/edit_member")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        if name == None:
+            name = mongo.find_member(member_id)["name"]
+        if committee == None:
+            committee = mongo.find_member(member_id)["committee"]
+            
+        member = mongo.edit_member(member_id, name, committee)
+        if member:
+            msg = f"Member {member_id} edited successfully!"
+        else: 
+            msg = f"Member {member_id} does not exist."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/edit_member", exc)
+        
+@client.tree.command(name="remove_member", description="Remove a member")
+async def remove_member(interaction: discord.Interaction, member_id: str):
+
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    await log(interaction, "/remove_member")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        member = mongo.delete_member(member_id)
+        if member:
+            msg = f"Member {member_id} removed successfully!"
+        else: 
+            msg = f"Member {member_id} does not exist."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/remove_member", exc)
 
 
 
