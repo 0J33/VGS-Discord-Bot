@@ -189,27 +189,27 @@ def calc_xp_report_helper_leaderboard(member_id, xp_ws):
     return total_xp
 
 def get_leaderboard(committee_name):
-  # Get the first worksheet in the members spreadsheet
-  sheet = sh_members.worksheet(committee_name)
+    # Get the first worksheet in the members spreadsheet
+    sheet = sh_members.worksheet(committee_name)
 
-  # Create an array of member objects with their ids, names, and xp values
-  members = []
-  for row in sheet.get_all_values():
-    members.append({"id": row[0], "name": row[1], "xp": calc_xp_report_helper_leaderboard(row[0], sh_xp.worksheet("Form Responses 1").get_all_values())})
+    # Create an array of member objects with their ids, names, and xp values
+    members = []
+    for row in sheet.get_all_values():
+        members.append({"id": row[0], "name": row[1], "xp": calc_xp_report_helper_leaderboard(row[0], sh_xp.worksheet("Form Responses 1").get_all_values())})
 
-  # Sort the members array by ascending xp
-  members.sort(key=lambda x: x["xp"])
+    # Sort the members array by ascending xp
+    members.sort(key=lambda x: x["xp"])
 
-  # Reverse the order of the members array to sort by descending xp
-  members.reverse()
+    # Reverse the order of the members array to sort by descending xp
+    members.reverse()
 
-# Create a table with the members' data
-  table = []
-  for i, member in enumerate(members):
-    table.append([i + 1, member["id"], member["name"], member["xp"]])
+    # Create a table with the members' data
+    table = []
+    for i, member in enumerate(members):
+        table.append([i + 1, member["id"], member["name"], member["xp"]])
 
-  # Return the table as a string
-  return tabulate(table, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+    # Return the table as a string
+    return tabulate(table, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
 
 # def get_leaderboard_all():
     
