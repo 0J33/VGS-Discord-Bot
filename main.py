@@ -865,12 +865,12 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
         await interaction.followup.send(embed=embed)
         exc(interaction, "/remove_task", exc)
 
-# /add_pw_xp (pw admin)
-# /add_bounty (pw admin)
-# /leaderboard_pw (pw)
 # /register_pw
 # /unregister_pw
 # /my_xp_pw
+# /leaderboard_pw (pw)
+# /add_pw_xp (pw admin)
+# /add_bounty (pw admin)
 
 # bounty:
 # xp range (str)
@@ -881,11 +881,10 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
 # bounty board (choose)
 
 # pw:
-# id
 # name
 # discord_id
-# xp
-# level
+# xp = 0
+# level = 1
 
 # level:
 # 5 * (lvl ^ 2) + (50 * lvl)
