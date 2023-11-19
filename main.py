@@ -1122,15 +1122,15 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
                 if bounty_board == "General":
                     channel = client.get_channel(1165711160360841296)
                 elif bounty_board == "Dev":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165715735000125441)
                 elif bounty_board == "IT":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1171570041888710727)
                 elif bounty_board == "Art":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165718818509828288)
                 elif bounty_board == "Sound":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165724693895073833)
                 elif bounty_board == "Design":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1171569571115827210)
                 
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await channel.send(embed=embed)
