@@ -93,7 +93,12 @@ async def help(interaction: discord.Interaction):
     **/my_xp**\ncheck your xp\n
     **/list_ids**\nlist ids of all members in a comittee\n
     **/leaderboard**\ncheck the leaderboard for a committee\n
-    **/leaderboard_all**\ncheck the leaderboard for all committees"""
+    **/leaderboard_all**\ncheck the leaderboard for all committees\n
+    **/register_pw**\nregister as a ps member\n
+    **/unregister_pw**\nunregister as a pw member\n
+    **/my_xp_pw**\ncheck your xp as a pw member\n
+    **/leaderboard_pw**\ncheck the leaderboard for pw members"""
+    
     #help command list for admins
     admin_help = """**/help**\nshows command list\n
     **/register_member**\nregister a member\n
@@ -105,11 +110,17 @@ async def help(interaction: discord.Interaction):
     **/list_ids**\nlist ids of all members in a comittee\n
     **/leaderboard**\ncheck the leaderboard for a committee\n
     **/leaderboard_all**\ncheck the leaderboard for all committees\n
+    **/register_pw**\nregister as a ps member\n
+    **/unregister_pw**\nunregister as a pw member\n
+    **/my_xp_pw**\ncheck your xp as a pw member\n
+    **/leaderboard_pw**\ncheck the leaderboard for pw members\n
     **/add_member**\nadd a new member\n
     **/edit_member**\nedit a member's details\n
-    **/remove_member**\nremove a member
+    **/remove_member**\nremove a member\n
+    **/all_tasks**\nview all tasks\n
     **/add_task**\nadd a new task\n
     **/remove_task**\nremove a task"""
+    
     #set admin_role as "Upper Board" role
     admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
     #set board_role as "Board" role
