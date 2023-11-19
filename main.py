@@ -107,7 +107,9 @@ async def help(interaction: discord.Interaction):
     **/leaderboard_all**\ncheck the leaderboard for all committees\n
     **/add_member**\nadd a new member\n
     **/edit_member**\nedit a member's details\n
-    **/remove_member**\nremove a member"""
+    **/remove_member**\nremove a member
+    **/add_task**\nadd a new task\n
+    **/remove_task**\nremove a task"""
     #set admin_role as "Upper Board" role
     admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
     #set board_role as "Board" role
