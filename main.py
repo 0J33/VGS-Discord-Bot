@@ -1120,7 +1120,8 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
                 msg = f"# {bounty_name}\nXP: {xp_range}\nDeadline: {deadline}\nType: {type}\nPrerequisites: {prerequisites}\n\nDescription:\n{bounty_details}"
 
                 if bounty_board == "General":
-                    channel = client.get_channel(1165711160360841296)
+                    # channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(871487383957286955)
                 elif bounty_board == "Dev":
                     channel = client.get_channel(1165715735000125441)
                 elif bounty_board == "IT":
@@ -1132,15 +1133,17 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
                 elif bounty_board == "Design":
                     channel = client.get_channel(1171569571115827210)
                 
-                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-                await channel.send(embed=embed)
+                await channel.send(msg)
             
                 msg = f"Hi {interaction.user.mention}!\nBounty added successfully!"
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
 
+                await interaction.followup.send(embed=embed)
+            
             else:
                 msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
-            
-            await interaction.followup.send(msg)
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                await interaction.followup.send(embed=embed)
         
         except Exception as exc:
             
