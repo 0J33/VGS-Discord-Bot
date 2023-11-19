@@ -1120,8 +1120,7 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
                 msg = f"# {bounty_name}\nXP: {xp_range}\nDeadline: {deadline}\nType: {type}\nPrerequisites: {prerequisites}\n\nDescription:\n{bounty_details}"
 
                 if bounty_board == "General":
-                    # channel = client.get_channel(1165711160360841296)
-                    channel = client.get_channel(871487383957286955)
+                    channel = client.get_channel(1165711160360841296)
                 elif bounty_board == "Dev":
                     channel = client.get_channel(1165715735000125441)
                 elif bounty_board == "IT":
