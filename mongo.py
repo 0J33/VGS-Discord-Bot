@@ -205,3 +205,71 @@ def get_members_committee(committee):
     collection = db["members"]
     members = collection.find({"committee": committee})
     return members
+
+def find_member_pw(discord_id):
+    collection = db["members_pw"]
+    member = collection.find_one({"discord_id": discord_id})
+    return member
+
+def register_pw(discord_id, name):
+    collection = db["members_pw"]
+    if collection.find_one({"discord_id": discord_id}) is not None:
+        return 0
+    else:
+        collection.insert_one({"discord_id": discord_id, "name": name, "level": 1, "xp": 0})
+        return 1
+    
+def unregister_pw(discord_id):
+    collection = db["members_pw"]
+    if collection.find_one({"discord_id": discord_id}) is not None:
+        collection.delete_one({"discord_id": discord_id})
+        return 1
+    else:
+        return 0
+    
+def get_leaderboard_pw():
+    collection = db["members_pw"]
+    members = collection.find({})
+    leaderboard = []
+    for member in members:
+        level = member['level']
+        xp = member['xp']
+        to_next_level = 5 * (level ** 2) + (50 * level)
+        while xp >= to_next_level:
+            level += 1
+            to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+            
+        if level > member['level']:
+            update_level_pw(member['discord_id'], level)    
+            
+        leaderboard.append([member["name"], member["level"], member["xp"]])
+    
+    leaderboard.sort(key=lambda x: x[2], reverse=True)
+
+    for i, member in enumerate(leaderboard):
+        leaderboard[i].insert(0, i+1)
+
+    return tabulate(leaderboard, headers=["Position", "Name", "Level", "XP"], tablefmt="grid")
+
+def add_xp_pw(discord_id, xp):
+    collection = db["members_pw"]
+    member = collection.find_one({"discord_id": discord_id})
+    if member is not None:
+        collection.update_one({"discord_id": discord_id}, {"$set": {"xp": member["xp"] + xp}})
+        return 0
+    else:
+        return 1
+    
+def update_level_pw(discord_id, level):
+    collection = db["members_pw"]
+    member = collection.find_one({"discord_id": discord_id})
+    if member is not None:
+        collection.update_one({"discord_id": discord_id}, {"$set": {"level": level}})
+        return 0
+    else:
+        return 1
+    
+def get_members_pw():
+    collection = db["members_pw"]
+    members = collection.find({})
+    return members

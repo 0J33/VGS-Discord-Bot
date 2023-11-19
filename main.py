@@ -213,7 +213,7 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
         print(exc)
         exc(interaction, "/commitee_report " + str(committee), exc)
 
-@client.tree.command(name="list_ids", description="list ids of all members in a comittee")
+@client.tree.command(name="list_ids", description="List ids of all members in a comittee")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
@@ -416,7 +416,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         await interaction.followup.send(embed=embed)
         exc(interaction, "/unregister_member " + str(member_mention.id), exc)
 
-@client.tree.command(name="leaderboard", description="Check the leaderboard")
+@client.tree.command(name="leaderboard", description="Check the leaderboard for a committee")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
@@ -472,7 +472,7 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
         await interaction.followup.send(embed=embed)
         exc(interaction, "/leaderboard", exc)
         
-@client.tree.command(name="leaderboard_all", description="Check the leaderboard")
+@client.tree.command(name="leaderboard_all", description="Check the leaderboard for all committees")
 async def leaderboard_all(interaction: discord.Interaction):
 
     await interaction.response.defer()
@@ -867,32 +867,291 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
         await interaction.followup.send(embed=embed)
         exc(interaction, "/remove_task", exc)
 
-# /register_pw
-# name
-# /unregister_pw
-# /my_xp_pw
-# /leaderboard_pw (pw)
-# /add_pw_xp (pw admin)
-# @ xp
-# /add_bounty (pw admin)
+@client.tree.command(name="register_pw", description="Register as a PW member")
+async def register_pw(interaction: discord.Interaction, name: str):
+    
+        await interaction.response.defer()
+        await asyncio.sleep(1)
+    
+        await log(interaction, "/register_pw")
+        
+        msg = ""
+        
+        try:
+            
+            pw = mongo.register_pw(interaction.user.id, name)
+            if pw:
+                msg = f"Hi {interaction.user.mention}!\nYou are now registered as a PW member!"
+            else:
+                msg = f"Hi {interaction.user.mention}!\nYou are already registered as a PW member!"
+    
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+                    
+        except Exception as exc:
+            print(exc)
+            msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+            await interaction.followup.send(msg)
+            exc(interaction, "/register_pw", exc)
 
-# bounty:
-# bounty name (str)
-# xp range (str)
-# deadline (str)
-# type (str)
-# prerequisites (str)
-# bounty details (str)
-# bounty board (choose)
+@client.tree.command(name="unregister_pw", description="Unregister as a PW member")
+async def unregister_pw(interaction: discord.Interaction):
+        
+    await interaction.response.defer()
+    await asyncio.sleep(1)
 
-# pw:
-# name
-# discord_id
-# xp = 0
-# level = 1
+    await log(interaction, "/unregister_pw")
+    
+    msg = ""
+    
+    try:
+        
+        pw = mongo.unregister_pw(interaction.user.id)
+        if pw:
+            msg = f"Hi {interaction.user.mention}!\nYou are now unregistered as a PW member!"
+        else:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered as a PW member!"
 
-# level:
-# 5 * (lvl ^ 2) + (50 * lvl)
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+                
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        await interaction.followup.send(msg)
+        exc(interaction, "/unregister_pw", exc)
+
+@client.tree.command(name="my_xp_pw", description="Check your xp as a PW member")
+async def my_xp_pw(interaction: discord.Interaction):
+            
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    await log(interaction, "/my_xp_pw")
+    
+    msg = ""
+    
+    try:
+        
+        member = mongo.find_member_pw(interaction.user.id)
+        if member:
+            level = member['level']
+            xp = member['xp']
+            to_next_level = 5 * (level ** 2) + (50 * level)
+            while xp >= to_next_level:
+                level += 1
+                to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                
+            if level > member['level']:
+                mongo.update_level_pw(interaction.user.id, level)    
+                
+                channel = client.get_channel(1165709063317880842)
+                user = client.get_user(member['discord_id'])
+                msg = f"Congratulations {user.mention}!\nYou have leveled up to level {level}!"
+                # msg = f"Congratulations <@{member['discord_id']}>!\nYou have leveled up to level {level}!"
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                await channel.send(embed=embed)
+                
+            msg = f"Hi {interaction.user.mention}!\nXP: {xp}/{to_next_level}\nLevel: {level}"
+        else:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered as a PW member!"
+
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+                
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        await interaction.followup.send(msg)
+        exc(interaction, "/my_xp_pw", exc)
+
+@client.tree.command(name="leaderboard_pw", description="Check the leaderboard for PW members")
+async def leaderboard_pw(interaction: discord.Interaction):
+    
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+
+    await log(interaction, "/leaderboard_pw")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        #look for the member using discord id, if member not registered error, else calc xp report and send it 
+        member = mongo.find_member_discord(interaction.user.id)
+        if member is None:
+            msg = f"Hi {interaction.user.mention}!\nYou are not registered as a PW member, register yourself first."
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+        else:
+            msg = mongo.get_leaderboard_pw()
+            
+            members = mongo.get_members_pw()
+            
+            for member in members:
+                level = member['level']
+                xp = member['xp']
+                to_next_level = 5 * (level ** 2) + (50 * level)
+                while xp >= to_next_level:
+                    level += 1
+                    to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                    
+                if level > member['level']:
+                    mongo.update_level_pw(member['discord_id'], level)    
+            
+                    channel = client.get_channel(1165709063317880842)
+                    user = client.get_user(member['discord_id'])
+                    msg = f"Congratulations {user.mention}!\nYou have leveled up to level {level}!"
+                    # msg = f"Congratulations <@{member['discord_id']}>!\nYou have leveled up to level {level}!"
+                    embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                    await channel.send(embed=embed)
+            
+            embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
+            # await interaction.followup.send(embed=embed)
+            os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\", exist_ok=True)
+            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt", "w") as file:
+                file.write(msg)
+            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt", filename=str(datetime) + "_PW" + ".txt")
+            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(file=file)
+            file.close()
+            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt")
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction ,"/leaderboard_pw", exc)
+
+@client.tree.command(name="add_xp_pw", description="Add XP to a PW member")
+async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: discord.Member):
+    
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+    
+    await log(interaction, "/add_pw_xp")
+    
+    msg = ""
+    
+    try:
+        #check if user is admin/tech or regular member and set the correct help message    
+        if interaction.user.id == 611941090429239306 or interaction.user.id == 529356422484590633:
+        
+            try:
+                #set member_user as the member object from the input member_mention
+                member_user = member_mention
+            except IndexError:
+                msg = f"Hi {interaction.user.mention}!\nIncorrect usage of the command, use /help for more information!"
+                return
+
+            #register member or send error message
+            exit_code = mongo.add_xp_pw(member_user.id, xp)
+            if exit_code == 0:
+                
+                members = mongo.get_members_pw()
+                
+                for member in members:
+                    level = member['level']
+                    xp = member['xp']
+                    to_next_level = 5 * (level ** 2) + (50 * level)
+                    while xp >= to_next_level:
+                        level += 1
+                        to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                        
+                    if level > member['level']:
+                        mongo.update_level_pw(member['discord_id'], level)
+                        
+                        channel = client.get_channel(1165709063317880842)
+                        user = client.get_user(member['discord_id'])
+                        msg = f"Congratulations {user.mention}!\nYou have leveled up to level {level}!"
+                        # msg = f"Congratulations <@{member['discord_id']}>!\nYou have leveled up to level {level}!"
+                        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                        await channel.send(embed=embed)
+                        
+                msg = f"Hi {interaction.user.mention}!\nXP added successfully!"
+                
+            elif exit_code == 1:
+                msg = f"Hi {interaction.user.mention}!\nMember is not registered as a PW member!"
+
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/add_pw_xp", exc)
+
+@client.tree.command(name="add_bounty", description="Add a bounty")
+@app_commands.describe(bounty_board = "Choose a bounty board")
+@app_commands.choices(bounty_board=[
+    discord.app_commands.Choice(name="General", value=1),
+    discord.app_commands.Choice(name="Dev", value=2),
+    discord.app_commands.Choice(name="IT", value=3),
+    discord.app_commands.Choice(name="Art", value=4),
+    discord.app_commands.Choice(name="Sound", value=5),
+    discord.app_commands.Choice(name="Design", value=6)
+])
+async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_range: str, deadline: str, type: str, prerequesites: str, bounty_details: str, bounty_board: discord.app_commands.Choice[int]):
+        
+        await interaction.response.defer(ephemeral=True)
+        await asyncio.sleep(1)
+    
+        bounty_board = bounty_board.name
+    
+        await log(interaction, "/add_bounty")
+        
+        msg = ""
+        
+        try:
+            #check if user is admin/tech or regular member and set the correct help message    
+            if interaction.user.id == 611941090429239306 or interaction.user.id == 529356422484590633:
+                
+                msg = f"# {bounty_name}\n\nXP: {xp_range}\nDeadline: {deadline}\nType: {type}\nPrerequisites: {prerequesites}\n\nDescription:\n{bounty_details}"
+
+                if bounty_board == "General":
+                    channel = client.get_channel(1165711160360841296)
+                elif bounty_board == "Dev":
+                    channel = client.get_channel(1165711160360841296)
+                elif bounty_board == "IT":
+                    channel = client.get_channel(1165711160360841296)
+                elif bounty_board == "Art":
+                    channel = client.get_channel(1165711160360841296)
+                elif bounty_board == "Sound":
+                    channel = client.get_channel(1165711160360841296)
+                elif bounty_board == "Design":
+                    channel = client.get_channel(1165711160360841296)
+                
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                await channel.send(embed=embed)
+            
+                msg = f"Hi {interaction.user.mention}!\nBounty added successfully!"
+
+            else:
+                msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+            
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+        
+        except Exception as exc:
+            
+            print(exc)
+            msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+            exc(interaction, "/add_bounty", exc)
+
+
 
 #keep the bot alive
 keep_alive()
