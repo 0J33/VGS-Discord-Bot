@@ -667,6 +667,118 @@ async def remove_member(interaction: discord.Interaction, member_id: str):
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
         exc(interaction, "/remove_member", exc)
+        
+@client.tree.command(name="all_tasks", description="View all tasks")
+async def all_tasks(interaction: discord.Interaction):
+
+    await interaction.response.defer(ephemeral=True)
+    await asyncio.sleep(1)
+
+    await log(interaction, "/all_tasks")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            tasks = mongo.get_all_tasks()
+            if tasks:
+                msg = tasks
+                os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\tasks\\", exist_ok=True)
+                with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\tasks\\" + str(datetime) + ".txt", "w") as file:
+                    file.write(msg)
+                file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\tasks\\" + str(datetime) + ".txt", filename=str(datetime) + ".txt")    
+                await interaction.followup.send(file=file)
+                file.close()
+                os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\tasks\\" + str(datetime) + ".txt")
+            else: 
+                msg = f"There are no tasks."
+                
+                embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+                await interaction.followup.send(embed=embed)
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+                
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/all_tasks", exc)
+
+# @client.tree.command(name="add_task", description="Add a task")
+# async def add_task(interaction: discord.Interaction):
+    # pass
+
+    ### add task ###
+    # authority, select
+    # name, str
+    # choose committee, select
+    # justification details, str
+    ## send
+    # choose members, select
+    ## send
+    # choose justification, select
+    ## send
+    ## if other type justification and type xp number
+
+# @client.tree.command(name="edit_task", description="Edit a task")
+# async def edit_task(interaction: discord.Interaction, task_id: str):
+#     pass
+
+@client.tree.command(name="remove_task", description="Remove a task")
+async def remove_task(interaction: discord.Interaction, task_id: str):
+
+    await interaction.response.defer(ephemeral=True)
+    await asyncio.sleep(1)
+
+    await log(interaction, "/remove_task")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+
+    try:
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            task = mongo.delete_task(int(task_id))
+            if task:
+                msg = f"Task {task_id} removed successfully!"
+            else: 
+                msg = f"Task {task_id} does not exist."
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+                
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+            
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/remove_task", exc)
 
 
 

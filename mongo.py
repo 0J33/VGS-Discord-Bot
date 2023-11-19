@@ -138,21 +138,6 @@ def get_leaderboard_all():
     
     return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
 
-def add_task(authority, name, committee, member_ids, justification, xp, details):
-    collection = db["xp"]
-    collection.insert_one({"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details})
-    return 0
-
-def edit_task(task_id, authority, name, committee, member_ids, justification, xp, details):
-    collection = db["xp"]
-    collection.update_one({"_id": task_id}, {"$set": {"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details}})
-    return 0
-
-def delete_task(task_id):
-    collection = db["xp"]
-    collection.delete_one({"_id": task_id})
-    return 0
-
 def add_member(member_id, name, committee):
     collection = db["members"]
     if find_member(member_id) is not None:
@@ -173,6 +158,53 @@ def delete_member(member_id):
     collection = db["members"]
     if find_member(member_id) is not None:
         collection.delete_one({"member_id": member_id})
+        return 1
+    else:
+        return 0
+    
+def get_all_tasks():
+    collection = db["xp"]
+    tasks = collection.find({})
+    msg = "=========== ALL TASKS ===========\n\n"
+    for task in tasks:
+        msg += f"Task ID: {task['id']}\n"
+        msg += f"Authority: {task['authority']}\n"
+        msg += f"Name: {task['name']}\n"
+        msg += f"Committee: {task['committee']}\n"
+        members = []
+        for member_id in task["member_ids"]:
+            member = find_member(member_id)
+            members.append([member["name"], member["member_id"]])
+        msg += f"Members: \n{tabulate(members, headers=['Name', 'ID'], tablefmt='grid')}\n"
+        msg += f"Justification: {task['justification']}\n"
+        msg += f"XP: {task['xp']}\n"
+        msg += f"Details: {task['details']}\n\n"
+        msg += "----------------------------------\n\n"
+    return msg
+        
+def add_task(authority, name, committee, member_ids, justification, xp, details):
+    collection = db["xp"]
+    docs = collection.find({})
+    max_id = 0
+    for doc in docs:
+        if doc["id"] > max_id:
+            max_id = doc["id"]
+    id = max_id + 1
+    collection.insert_one({"id": id, "authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details})
+    return 0
+
+def edit_task(task_id, authority, name, committee, member_ids, justification, xp, details):
+    collection = db["xp"]
+    if collection.find_one({"id": task_id}) is not None:
+        collection.update_one({"id": task_id}, {"$set": {"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details}})
+        return 1
+    else:
+        return 0
+
+def delete_task(task_id):
+    collection = db["xp"]
+    if collection.find_one({"id": task_id}) is not None:
+        collection.delete_one({"id": task_id})
         return 1
     else:
         return 0
