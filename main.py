@@ -5,6 +5,7 @@ import os
 import discord
 from discord import app_commands
 from discord.ext import commands
+from discord.ui import Select
 from time import time, ctime
 #from datetime import datetime
 #import datetime
@@ -15,6 +16,8 @@ import pathlib
 #load_dotenv()
 # import mongo
 import mongo
+import select_handle
+from select_handle import *
 
 
 #bot token
@@ -107,17 +110,19 @@ async def help(interaction: discord.Interaction):
     **/remove_member**\nremove a member"""
     #set admin_role as "Upper Board" role
     admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+    #set board_role as "Board" role
+    board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
     #set tech_role as technician role
     tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
     
     #check if user is admin/tech or regular member and set the correct help message
-    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+    if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
         help_string = admin_help
     else:
         help_string = member_help
     
     embed = discord.Embed(title="Commands:", description=help_string,colour=discord.Color.from_rgb(25, 25, 26))
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
     await interaction.followup.send(embed=embed)
 
@@ -152,17 +157,16 @@ async def my_xp(interaction: discord.Interaction):
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="LIT", value=2),
-    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
     discord.app_commands.Choice(name="HR", value=5),
     discord.app_commands.Choice(name="MD", value=6),
-    discord.app_commands.Choice(name="EP", value=7),
-    discord.app_commands.Choice(name="GAD", value=8),
-    discord.app_commands.Choice(name="GDD", value=9),
-    discord.app_commands.Choice(name="GSD", value=10)
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
 ])
-async def committee(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
+async def committee_report(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
     await interaction.response.defer()
     await asyncio.sleep(1)
@@ -181,7 +185,7 @@ async def committee(interaction: discord.Interaction, committee: discord.app_com
     try:
         #if commitee empty or invalid then error, else calc commitee report and send it
         if committee is None:
-            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [BOARD] [LIT] [MRKT] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]\nexample: /committee_report CL"
+            msg = f"Hi {interaction.user.mention}!\nYou must select a committee from [BOARD] [LIT] [SM] [FR] [HR] [MD] [EP] [GAD] [GDD] [GSD]\nexample: /committee_report CL"
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
@@ -211,15 +215,14 @@ async def committee(interaction: discord.Interaction, committee: discord.app_com
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="LIT", value=2),
-    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
     discord.app_commands.Choice(name="HR", value=5),
     discord.app_commands.Choice(name="MD", value=6),
-    discord.app_commands.Choice(name="EP", value=7),
-    discord.app_commands.Choice(name="GAD", value=8),
-    discord.app_commands.Choice(name="GDD", value=9),
-    discord.app_commands.Choice(name="GSD", value=10)
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
 ])
 async def list_ids(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
@@ -326,11 +329,13 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
     
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message    
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
         
             try:
                 #set member_user as the member object from the input member_mention
@@ -375,11 +380,13 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
     try:
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message    
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             
             try:
                 #set member_user as the member object from the input member_mention
@@ -411,15 +418,14 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="LIT", value=2),
-    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
     discord.app_commands.Choice(name="HR", value=5),
     discord.app_commands.Choice(name="MD", value=6),
-    discord.app_commands.Choice(name="EP", value=7),
-    discord.app_commands.Choice(name="GAD", value=8),
-    discord.app_commands.Choice(name="GDD", value=9),
-    discord.app_commands.Choice(name="GSD", value=10)
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
 ])
 async def leaderboard(interaction: discord.Interaction, committee: discord.app_commands.Choice[int]):
 
@@ -511,15 +517,14 @@ async def leaderboard_all(interaction: discord.Interaction):
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="LIT", value=2),
-    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
     discord.app_commands.Choice(name="HR", value=5),
     discord.app_commands.Choice(name="MD", value=6),
-    discord.app_commands.Choice(name="EP", value=7),
-    discord.app_commands.Choice(name="GAD", value=8),
-    discord.app_commands.Choice(name="GDD", value=9),
-    discord.app_commands.Choice(name="GSD", value=10)
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
 ])
 async def add_member(interaction: discord.Interaction, member_id: str, name: str, committee: discord.app_commands.Choice[int]):
     
@@ -541,11 +546,13 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
         
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             member = mongo.add_member(member_id, name, committee)
             if member:
                 msg = f"Member {member_id} already exists."
@@ -568,15 +575,14 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
     discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="LIT", value=2),
-    discord.app_commands.Choice(name="MRKT", value=3),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
     discord.app_commands.Choice(name="HR", value=5),
     discord.app_commands.Choice(name="MD", value=6),
-    discord.app_commands.Choice(name="EP", value=7),
-    discord.app_commands.Choice(name="GAD", value=8),
-    discord.app_commands.Choice(name="GDD", value=9),
-    discord.app_commands.Choice(name="GSD", value=10)
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
 ])
 async def edit_member(interaction: discord.Interaction, member_id: str, name: str = None, committee: discord.app_commands.Choice[int] = None):
     
@@ -600,11 +606,13 @@ async def edit_member(interaction: discord.Interaction, member_id: str, name: st
     try:
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             member = mongo.edit_member(member_id, name, committee)
             if member:
                 if name == None:
@@ -645,11 +653,13 @@ async def remove_member(interaction: discord.Interaction, member_id: str):
     try:
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             member = mongo.delete_member(member_id)
             if member:
                 msg = f"Member {member_id} removed successfully!"
@@ -686,11 +696,13 @@ async def all_tasks(interaction: discord.Interaction):
     try:
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             tasks = mongo.get_all_tasks()
             if tasks:
                 msg = tasks
@@ -719,25 +731,96 @@ async def all_tasks(interaction: discord.Interaction):
         await interaction.followup.send(embed=embed)
         exc(interaction, "/all_tasks", exc)
 
-# @client.tree.command(name="add_task", description="Add a task")
-# async def add_task(interaction: discord.Interaction):
-    # pass
+@client.tree.command(name="add_task", description="Add a task")
+@app_commands.describe(committee = "Enter a committee")
+@app_commands.choices(committee=[
+    discord.app_commands.Choice(name="BOARD", value=1),
+    discord.app_commands.Choice(name="CL", value=2),
+    discord.app_commands.Choice(name="SM", value=3),
+    discord.app_commands.Choice(name="FR", value=4),
+    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="GAD", value=7),
+    discord.app_commands.Choice(name="GDD", value=8),
+    discord.app_commands.Choice(name="GSD", value=9)
+])
+async def add_task(interaction: discord.Interaction, xp: int, justification: str, committee: discord.app_commands.Choice[int]):
+    
+    await interaction.response.defer(ephemeral=True)
+    await asyncio.sleep(1)
 
-    ### add task ###
-    # authority, select
-    # name, str
-    # choose committee, select
-    # justification details, str
-    ## send
-    # choose members, select
-    ## send
-    # choose justification, select
-    ## send
-    ## if other type justification and type xp number
+    try:
+        committee = committee.name
+    except:
+        committee = None
 
-# @client.tree.command(name="edit_task", description="Edit a task")
-# async def edit_task(interaction: discord.Interaction, task_id: str):
-#     pass
+    await log(interaction, "/add_task")
+    
+    #get the time and fix the format for file saving
+    datetime = await get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    
+    msg = ""
+    
+    try:
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            
+            # edit the message to show a view with one select menu that has the names and ids of all the members in that committee
+            
+            # get member_id of the user that used the command
+            member_id = mongo.find_member_discord(interaction.user.id)["member_id"]
+            
+            committee_members = mongo.get_members_committee(committee)
+            members = []
+            for member in committee_members:
+                members.append([member["name"], member["member_id"]])
+                
+            embed=None
+            options = members
+            
+            text=f"Hi {interaction.user.mention}!\nPlease select the members that will be given the xp:\n"
+            embed = discord.Embed(title="", description=text, colour=discord.Color.from_rgb(25, 25, 26))
+            
+            # create the select menu
+            select = Select(
+                custom_id="select",
+                placeholder="Select members",
+                min_values=1,
+                max_values=len(options),
+            )
+            
+            for option in options:
+                option = f"{option[0]} - {option[1]}"
+                select.append_option(discord.SelectOption(label=option, value=option))
+
+            select.callback = lambda i: handle_select_add_task(i, member_id, xp, justification, committee)
+            
+            view = discord.ui.View(timeout=None)
+            view.add_item(select)
+        
+            await interaction.followup.send(embed=embed, view=view)
+    
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+                
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+
+    except Exception as exc:
+        print(exc)
+        msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
+        embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
+        exc(interaction, "/add_task", exc)
 
 @client.tree.command(name="remove_task", description="Remove a task")
 async def remove_task(interaction: discord.Interaction, task_id: str):
@@ -757,11 +840,13 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
     try:
         #set admin_role as "Upper Board" role
         admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set board_role as "Board" role
+        board_role = discord.utils.find(lambda r: r.name == 'Board', interaction.guild.roles)
         #set tech_role as technician role
         tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
         
         #check if user is admin/tech or regular member and set the correct help message
-        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
             task = mongo.delete_task(int(task_id))
             if task:
                 msg = f"Task {task_id} removed successfully!"
@@ -780,7 +865,29 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
         await interaction.followup.send(embed=embed)
         exc(interaction, "/remove_task", exc)
 
+# /register_pw
+# /unregister_pw
+# /my_xp_pw
+# /leaderboard_pw (pw)
+# /add_pw_xp (pw admin)
+# /add_bounty (pw admin)
 
+# bounty:
+# xp range (str)
+# bounty name (str)
+# bounty details (str)
+# type (str)
+# prerequisites (str)
+# bounty board (choose)
+
+# pw:
+# name
+# discord_id
+# xp = 0
+# level = 1
+
+# level:
+# 5 * (lvl ^ 2) + (50 * lvl)
 
 #keep the bot alive
 keep_alive()
