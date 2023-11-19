@@ -168,9 +168,7 @@ def get_all_tasks():
     msg = "=========== ALL TASKS ===========\n\n"
     for task in tasks:
         msg += f"Task ID: {task['id']}\n"
-        msg += f"Authority: {task['authority']}\n"
-        msg += f"Name: {task['name']}\n"
-        msg += f"Committee: {task['committee']}\n"
+        msg += f"Member ID: {task['member_id']}\n"
         members = []
         for member_id in task["member_ids"]:
             member = find_member(member_id)
@@ -178,27 +176,21 @@ def get_all_tasks():
         msg += f"Members: \n{tabulate(members, headers=['Name', 'ID'], tablefmt='grid')}\n"
         msg += f"Justification: {task['justification']}\n"
         msg += f"XP: {task['xp']}\n"
-        msg += f"Details: {task['details']}\n\n"
         msg += "----------------------------------\n\n"
     return msg
         
-def add_task(authority, name, committee, member_ids, justification, xp, details):
+def add_task(member_id, xp, justification, member_ids):
     collection = db["xp"]
-    docs = collection.find({})
-    max_id = 0
-    for doc in docs:
-        if doc["id"] > max_id:
-            max_id = doc["id"]
-    id = max_id + 1
-    collection.insert_one({"id": id, "authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details})
-    return 0
-
-def edit_task(task_id, authority, name, committee, member_ids, justification, xp, details):
-    collection = db["xp"]
-    if collection.find_one({"id": task_id}) is not None:
-        collection.update_one({"id": task_id}, {"$set": {"authority": authority, "name": name, "committee": committee, "member_ids": member_ids, "justification": justification, "xp": xp, "details": details}})
+    try:
+        docs = collection.find({})
+        max_id = 0
+        for doc in docs:
+            if doc["id"] > max_id:
+                max_id = doc["id"]
+        id = max_id + 1
+        collection.insert_one({"id": id, "member_id": member_id, "member_ids": member_ids, "xp": xp, "justification": justification})
         return 1
-    else:
+    except:
         return 0
 
 def delete_task(task_id):
@@ -208,3 +200,8 @@ def delete_task(task_id):
         return 1
     else:
         return 0
+    
+def get_members_committee(committee):
+    collection = db["members"]
+    members = collection.find({"committee": committee})
+    return members
