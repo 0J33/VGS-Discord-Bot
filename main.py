@@ -529,16 +529,27 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
     datetime = datetime.replace(":", ".")
     
     msg = ""
-
+    
     try:
-        member = mongo.add_member(member_id, name, committee)
-        if member:
-            msg = f"Member {member_id} already exists."
-        else: 
-            msg = f"Member {member_id} added successfully!"
-        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-        await interaction.followup.send(embed=embed)
-            
+        
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            member = mongo.add_member(member_id, name, committee)
+            if member:
+                msg = f"Member {member_id} already exists."
+            else: 
+                msg = f"Member {member_id} added successfully!"
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+
+            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+            await interaction.followup.send(embed=embed)
+                
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
@@ -576,16 +587,26 @@ async def edit_member(interaction: discord.Interaction, member_id: str, name: st
     msg = ""
 
     try:
-        if name == None:
-            name = mongo.find_member(member_id)["name"]
-        if committee == None:
-            committee = mongo.find_member(member_id)["committee"]
-            
-        member = mongo.edit_member(member_id, name, committee)
-        if member:
-            msg = f"Member {member_id} edited successfully!"
-        else: 
-            msg = f"Member {member_id} does not exist."
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            if name == None:
+                name = mongo.find_member(member_id)["name"]
+            if committee == None:
+                committee = mongo.find_member(member_id)["committee"]
+                
+            member = mongo.edit_member(member_id, name, committee)
+            if member:
+                msg = f"Member {member_id} edited successfully!"
+            else: 
+                msg = f"Member {member_id} does not exist."
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+        
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
             
@@ -612,11 +633,21 @@ async def remove_member(interaction: discord.Interaction, member_id: str):
     msg = ""
 
     try:
-        member = mongo.delete_member(member_id)
-        if member:
-            msg = f"Member {member_id} removed successfully!"
-        else: 
-            msg = f"Member {member_id} does not exist."
+        #set admin_role as "Upper Board" role
+        admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+        #set tech_role as technician role
+        tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+        
+        #check if user is admin/tech or regular member and set the correct help message
+        if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            member = mongo.delete_member(member_id)
+            if member:
+                msg = f"Member {member_id} removed successfully!"
+            else: 
+                msg = f"Member {member_id} does not exist."
+        else:
+            msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
+                
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
             
