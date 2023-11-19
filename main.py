@@ -937,10 +937,10 @@ async def my_xp_pw(interaction: discord.Interaction):
         if member:
             level = member['level']
             xp = member['xp']
-            to_next_level = 5 * (level ** 2) + (50 * level)
+            to_next_level = 10 * (level ** 2) + (100 * level)
             while xp >= to_next_level:
                 level += 1
-                to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
                 
             if level > member['level']:
                 mongo.update_level_pw(interaction.user.id, level)    
@@ -995,10 +995,10 @@ async def leaderboard_pw(interaction: discord.Interaction):
             for member in members:
                 level = member['level']
                 xp = member['xp']
-                to_next_level = 5 * (level ** 2) + (50 * level)
+                to_next_level = 10 * (level ** 2) + (100 * level)
                 while xp >= to_next_level:
                     level += 1
-                    to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                    to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
                     
                 if level > member['level']:
                     mongo.update_level_pw(member['discord_id'], level)    
@@ -1059,10 +1059,10 @@ async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: d
                 for member in members:
                     level = member['level']
                     xp = member['xp']
-                    to_next_level = 5 * (level ** 2) + (50 * level)
+                    to_next_level = 10 * (level ** 2) + (100 * level)
                     while xp >= to_next_level:
                         level += 1
-                        to_next_level = 5 * (level ** 2) + (50 * level) # 5 * (lvl ^ 2) + (50 * lvl)
+                        to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
                         
                     if level > member['level']:
                         mongo.update_level_pw(member['discord_id'], level)
