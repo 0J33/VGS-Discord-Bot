@@ -1154,6 +1154,7 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
                 msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await interaction.followup.send(embed=embed)
+                await interaction.message.add_reaction("✅")
         
         except Exception as exc:
             
