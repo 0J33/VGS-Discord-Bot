@@ -1032,7 +1032,7 @@ async def leaderboard_pw(interaction: discord.Interaction):
 @client.tree.command(name="add_xp_pw", description="Add XP to a PW member")
 async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: discord.Member):
     
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
     
     await log(interaction, "/add_pw_xp")
