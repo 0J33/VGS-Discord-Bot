@@ -868,18 +868,21 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
         exc(interaction, "/remove_task", exc)
 
 # /register_pw
+# name
 # /unregister_pw
 # /my_xp_pw
 # /leaderboard_pw (pw)
 # /add_pw_xp (pw admin)
+# @ xp
 # /add_bounty (pw admin)
 
 # bounty:
-# xp range (str)
 # bounty name (str)
-# bounty details (str)
+# xp range (str)
+# deadline (str)
 # type (str)
 # prerequisites (str)
+# bounty details (str)
 # bounty board (choose)
 
 # pw:
