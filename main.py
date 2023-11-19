@@ -1102,7 +1102,7 @@ async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: d
     discord.app_commands.Choice(name="Sound", value=5),
     discord.app_commands.Choice(name="Design", value=6)
 ])
-async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_range: str, deadline: str, type: str, prerequesites: str, bounty_details: str, bounty_board: discord.app_commands.Choice[int]):
+async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_range: str, deadline: str, type: str, prerequisites: str, bounty_details: str, bounty_board: discord.app_commands.Choice[int]):
         
         await interaction.response.defer(ephemeral=True)
         await asyncio.sleep(1)
@@ -1117,20 +1117,20 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
             #check if user is admin/tech or regular member and set the correct help message    
             if interaction.user.id == 611941090429239306 or interaction.user.id == 529356422484590633:
                 
-                msg = f"# {bounty_name}\n\nXP: {xp_range}\nDeadline: {deadline}\nType: {type}\nPrerequisites: {prerequesites}\n\nDescription:\n{bounty_details}"
+                msg = f"# {bounty_name}\n\nXP: {xp_range}\nDeadline: {deadline}\nType: {type}\nPrerequisites: {prerequisites}\n\nDescription:\n{bounty_details}"
 
                 if bounty_board == "General":
                     channel = client.get_channel(1165711160360841296)
                 elif bounty_board == "Dev":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165715735000125441)
                 elif bounty_board == "IT":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1171570041888710727)
                 elif bounty_board == "Art":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165718818509828288)
                 elif bounty_board == "Sound":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1165724693895073833)
                 elif bounty_board == "Design":
-                    channel = client.get_channel(1165711160360841296)
+                    channel = client.get_channel(1171569571115827210)
                 
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                 await channel.send(embed=embed)
