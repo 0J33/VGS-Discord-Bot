@@ -10,7 +10,7 @@ from time import time, ctime
 #import datetime
 import pathlib
 
-import gspread
+# import gspread
 #from dotenv import load_dotenv
 #load_dotenv()
 # import mongo
@@ -81,38 +81,45 @@ async def on_message(message):
 @client.tree.command(name="help", description="Shows command list")
 async def help(interaction: discord.Interaction):
   
-  await log(interaction, "/help")
-  
-  #help command list for members
-  member_help = """**/help**\nshows command list\n
-  **/register_self**\nregister yourself as a member\n
-  **/unregister_self**\nunregister yourself as a member\n
-  **/my_xp**\ncheck your xp\n
-  **/list_ids**\nlist ids of all members in a comittee"""
-  #help command list for admins
-  admin_help = """**/help**\nshows command list\n
-  **/register_member**\nregister a member\n
-  **/unregister_member**\nunregister a member\n
-  **/register_self**\nregister yourself as a member\n
-  **/unregister_self**\nunregister yourself as a member\n
-  **/my_xp**\ncheck your xp\n
-  **/commitee_report**\nsee a report about commitee\n
-  **/list_ids**\nlist ids of all members in a comittee"""
-  #set admin_role as "Upper Board" role
-  admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
-  #set tech_role as technician role
-  tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
-  
-  #check if user is admin/tech or regular member and set the correct help message
-  if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
-    help_string = admin_help
-  else:
-    help_string = member_help
-  
-  embed = discord.Embed(title="Commands:", description=help_string,colour=discord.Color.from_rgb(25, 25, 26))
-  await interaction.response.defer()
-  await asyncio.sleep(1)
-  await interaction.followup.send(embed=embed)
+    await log(interaction, "/help")
+    
+    #help command list for members
+    member_help = """**/help**\nshows command list\n
+    **/register_self**\nregister yourself as a member\n
+    **/unregister_self**\nunregister yourself as a member\n
+    **/my_xp**\ncheck your xp\n
+    **/list_ids**\nlist ids of all members in a comittee\n
+    **/leaderboard**\ncheck the leaderboard for a committee\n
+    **/leaderboard_all**\ncheck the leaderboard for all committees"""
+    #help command list for admins
+    admin_help = """**/help**\nshows command list\n
+    **/register_member**\nregister a member\n
+    **/unregister_member**\nunregister a member\n
+    **/register_self**\nregister yourself as a member\n
+    **/unregister_self**\nunregister yourself as a member\n
+    **/my_xp**\ncheck your xp\n
+    **/commitee_report**\nsee a report about commitee\n
+    **/list_ids**\nlist ids of all members in a comittee\n
+    **/leaderboard**\ncheck the leaderboard for a committee\n
+    **/leaderboard_all**\ncheck the leaderboard for all committees\n
+    **/add_member**\nadd a new member\n
+    **/edit_member**\nedit a member's details\n
+    **/remove_member**\nremove a member"""
+    #set admin_role as "Upper Board" role
+    admin_role = discord.utils.find(lambda r: r.name == 'Upper Board', interaction.guild.roles)
+    #set tech_role as technician role
+    tech_role = discord.utils.find(lambda r: r.name == 'Technician', interaction.guild.roles)
+    
+    #check if user is admin/tech or regular member and set the correct help message
+    if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+        help_string = admin_help
+    else:
+        help_string = member_help
+    
+    embed = discord.Embed(title="Commands:", description=help_string,colour=discord.Color.from_rgb(25, 25, 26))
+    await interaction.response.defer()
+    await asyncio.sleep(1)
+    await interaction.followup.send(embed=embed)
 
 @client.tree.command(name="my_xp", description="Check your xp")
 async def my_xp(interaction: discord.Interaction):
@@ -515,8 +522,8 @@ async def leaderboard_all(interaction: discord.Interaction):
     discord.app_commands.Choice(name="GSD", value=10)
 ])
 async def add_member(interaction: discord.Interaction, member_id: str, name: str, committee: discord.app_commands.Choice[int]):
-
-    await interaction.response.defer()
+    
+    await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
 
     committee = committee.name
@@ -547,8 +554,8 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
         else:
             msg = f"Hi {interaction.user.mention}!\n You don't have permission to use this command"
 
-            embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
-            await interaction.followup.send(embed=embed)
+        embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
+        await interaction.followup.send(embed=embed)
                 
     except Exception as exc:
         print(exc)
@@ -572,10 +579,14 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
     discord.app_commands.Choice(name="GSD", value=10)
 ])
 async def edit_member(interaction: discord.Interaction, member_id: str, name: str = None, committee: discord.app_commands.Choice[int] = None):
-    await interaction.response.defer()
+    
+    await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
 
-    committee = committee.name
+    try:
+        committee = committee.name
+    except:
+        committee = None
 
     await log(interaction, "/edit_member")
     
@@ -594,14 +605,13 @@ async def edit_member(interaction: discord.Interaction, member_id: str, name: st
         
         #check if user is admin/tech or regular member and set the correct help message
         if admin_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
-            if name == None:
-                name = mongo.find_member(member_id)["name"]
-            if committee == None:
-                committee = mongo.find_member(member_id)["committee"]
-                
             member = mongo.edit_member(member_id, name, committee)
             if member:
-                msg = f"Member {member_id} edited successfully!"
+                if name == None:
+                    name = mongo.find_member(member_id)["name"]
+                if committee == None:
+                    committee = mongo.find_member(member_id)["committee"]
+                    msg = f"Member {member_id} edited successfully!"
             else: 
                 msg = f"Member {member_id} does not exist."
         else:
@@ -620,7 +630,7 @@ async def edit_member(interaction: discord.Interaction, member_id: str, name: st
 @client.tree.command(name="remove_member", description="Remove a member")
 async def remove_member(interaction: discord.Interaction, member_id: str):
 
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
 
     await log(interaction, "/remove_member")
