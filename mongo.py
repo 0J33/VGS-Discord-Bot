@@ -332,4 +332,3 @@ def make_img(text, datetime):
     
     return r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png"
 
-get_leaderboard_pw("test")
