@@ -993,7 +993,7 @@ async def leaderboard_pw(interaction: discord.Interaction):
 
     try:
         #look for the member using discord id, if member not registered error, else calc xp report and send it 
-        member = mongo.find_member_discord(interaction.user.id)
+        member = mongo.find_member_discord_pw(interaction.user.id)
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered as a PW member, register yourself first."
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
