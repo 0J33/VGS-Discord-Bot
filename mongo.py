@@ -306,7 +306,7 @@ def make_img(text, datetime):
     draw = ImageDraw.Draw(img)
 
     # Define the fonts to use (change to fonts installed on your system)
-    interval_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
+    ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
     consola_font = ImageFont.truetype("consola.ttf", 70)
 
     # Draw the text on the image
@@ -314,12 +314,12 @@ def make_img(text, datetime):
     for line in lines:
         x = 10
         for char in line:
-            # Use the "consola" font for characters that are not supported by the "Interval Bold" font
-            if not interval_font.getmask(char).getbbox():
+            # Use the "consola" font for characters that are not supported by the "Ubunutu Regular" font
+            if not ubuntu_font.getmask(char).getbbox():
                 draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
             else:
-                draw.text((x, y), char, fill=(255, 255, 255), font=interval_font)
-            x += interval_font.getsize(char)[0]
+                draw.text((x, y), char, fill=(255, 255, 255), font=ubuntu_font)
+            x += ubuntu_font.getsize(char)[0]
         y += line_height + line_spacing
 
     # Save the image
