@@ -3,6 +3,7 @@ import pathlib
 from pymongo import MongoClient
 from tabulate import tabulate
 from PIL import Image, ImageDraw, ImageFont
+from urllib.request import urlopen
 
 try:
     from env import connection_string
@@ -308,10 +309,11 @@ def make_img(text, datetime):
     # Define the fonts to use (change to fonts installed on your system)
     try:
         ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
+        consola_font = ImageFont.truetype("consola.ttf", 70)
     except:
-        font_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "fonts", "UBUNTUMONO-REGULAR.TTF")
-        ubuntu_font = ImageFont.truetype(font_path, 60)
-    consola_font = ImageFont.truetype("consola.ttf", 70)
+        # dont use fonts
+        ubuntu_font = ImageFont.load_default()
+        consola_font = ImageFont.load_default()
 
     # Draw the text on the image
     y = 10
