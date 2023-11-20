@@ -309,9 +309,10 @@ def make_img(text, datetime):
     # Define the fonts to use (change to fonts installed on your system)
     try:
         ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
-        consola_font = ImageFont.truetype("consola.ttf", 70)
+        consola_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "CONSOLA.TTF", 70)
     except:
-        raise Exception("error")
+        ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "/fonts/" + "UBUNTUMONO-REGULAR.TTF", 60)
+        consola_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "/fonts/" + "CONSOLA.TTF", 70)
 
     # Draw the text on the image
     y = 10
@@ -323,10 +324,7 @@ def make_img(text, datetime):
                 draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
             else:
                 draw.text((x, y), char, fill=(255, 255, 255), font=ubuntu_font)
-            try:
-                x += ubuntu_font.getsize(char)[0]
-            except:
-                x += 30
+            x += ubuntu_font.getsize(char)[0]
         y += line_height + line_spacing
 
     # Save the image
@@ -334,3 +332,4 @@ def make_img(text, datetime):
     
     return r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png"
 
+get_leaderboard_pw("test")
