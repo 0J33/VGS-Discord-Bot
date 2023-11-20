@@ -311,12 +311,7 @@ def make_img(text, datetime):
         ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
         consola_font = ImageFont.truetype("consola.ttf", 70)
     except:
-        # dont use fonts
-        ubuntu_font = ImageFont.load_default()
-        consola_font = ImageFont.load_default()
-        # font size
-        ubuntu_font.size = 60
-        consola_font.size = 70
+        raise Exception("error")
 
     # Draw the text on the image
     y = 10
