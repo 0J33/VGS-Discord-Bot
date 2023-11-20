@@ -273,3 +273,8 @@ def get_members_pw():
     collection = db["members_pw"]
     members = collection.find({})
     return members
+
+def find_member_discord_pw(discord_id):
+    collection = db["members_pw"]
+    member = collection.find_one({"discord_id": discord_id})
+    return member
