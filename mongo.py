@@ -218,12 +218,19 @@ def get_members_committee(committee):
 def find_member_pw(discord_id):
     collection = db["members_pw"]
     member = collection.find_one({"discord_id": discord_id})
+    if member["name"] is None:
+        return None
     return member
 
 def register_pw(discord_id, name):
     collection = db["members_pw"]
+    # if record exists with the discord_id and name is not None, then return 1
     if collection.find_one({"discord_id": discord_id}) is not None:
-        return 0
+        if collection.find_one({"discord_id": discord_id})["name"] is not None:
+            return 0
+        else:
+            collection.update_one({"discord_id": discord_id}, {"$set": {"name": name}})
+            return 1
     else:
         collection.insert_one({"discord_id": discord_id, "name": name, "level": 1, "xp": 0})
         return 1
@@ -231,7 +238,7 @@ def register_pw(discord_id, name):
 def unregister_pw(discord_id):
     collection = db["members_pw"]
     if collection.find_one({"discord_id": discord_id}) is not None:
-        collection.delete_one({"discord_id": discord_id})
+        collection.update_one({"discord_id": discord_id}, {"$set": {"name": None}})
         return 1
     else:
         return 0
@@ -241,17 +248,18 @@ def get_leaderboard_pw(datetime):
     members = collection.find({})
     leaderboard = []
     for member in members:
-        level = member['level']
-        xp = member['xp']
-        to_next_level = 10 * (level ** 2) + (100 * level)
-        while xp >= to_next_level:
-            level += 1
-            to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
-            
-        if level > member['level']:
-            update_level_pw(member['discord_id'], level)    
-            
-        leaderboard.append([member["name"], member["level"], member["xp"]])
+        if member["name"] is not None:
+            level = member['level']
+            xp = member['xp']
+            to_next_level = 10 * (level ** 2) + (100 * level)
+            while xp >= to_next_level:
+                level += 1
+                to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
+                
+            if level > member['level']:
+                update_level_pw(member['discord_id'], level)    
+                
+            leaderboard.append([member["name"], member["level"], member["xp"]])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
 
@@ -266,7 +274,7 @@ def get_leaderboard_pw(datetime):
 def add_xp_pw(discord_id, xp):
     collection = db["members_pw"]
     member = collection.find_one({"discord_id": discord_id})
-    if member is not None:
+    if member is not None and member["name"] is not None:
         collection.update_one({"discord_id": discord_id}, {"$set": {"xp": member["xp"] + xp}})
         return 0
     else:
@@ -275,7 +283,7 @@ def add_xp_pw(discord_id, xp):
 def update_level_pw(discord_id, level):
     collection = db["members_pw"]
     member = collection.find_one({"discord_id": discord_id})
-    if member is not None:
+    if member is not None and member["name"] is not None:
         collection.update_one({"discord_id": discord_id}, {"$set": {"level": level}})
         return 0
     else:
@@ -284,11 +292,16 @@ def update_level_pw(discord_id, level):
 def get_members_pw():
     collection = db["members_pw"]
     members = collection.find({})
+    for member in members:
+        if member["name"] is None:
+            members.remove(member)
     return members
 
 def find_member_discord_pw(discord_id):
     collection = db["members_pw"]
     member = collection.find_one({"discord_id": discord_id})
+    if member["name"] is None:
+        return None
     return member
 
 
@@ -335,4 +348,3 @@ def make_img(text, datetime):
     
     return r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png"
 
-get_leaderboard_pw("test")
