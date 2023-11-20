@@ -464,18 +464,14 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else:
-            msg = mongo.get_leaderboard(committee)
+            img = mongo.get_leaderboard(committee, datetime)
+            file=discord.File(img, filename="image.png")
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-            # await interaction.followup.send(embed=embed)
-            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", "w") as file:
-                file.write(msg)
-            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt", filename=str(datetime) + "_" + committee + ".txt")
-            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            await interaction.followup.send(file=file)
+            embed.set_image(url="attachment://image.png")
+            await interaction.followup.send(embed=embed, file=file)
             file.close()
-            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_" + committee + ".txt")
-            
+            os.remove(img)
+
     except Exception as exc:
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
@@ -506,18 +502,13 @@ async def leaderboard_all(interaction: discord.Interaction):
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else:
-            msg = mongo.get_leaderboard_all()
+            img = mongo.get_leaderboard_all(datetime)
+            file=discord.File(img, filename="image.png")
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-            # await interaction.followup.send(embed=embed)
-            os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\", exist_ok=True)
-            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt", "w") as file:
-                file.write(msg)
-            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt", filename=str(datetime) + "_ALL" + ".txt")
-            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            await interaction.followup.send(file=file)
+            embed.set_image(url="attachment://image.png")
+            await interaction.followup.send(embed=embed, file=file)
             file.close()
-            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_ALL" + ".txt")
+            os.remove(img)
             
     except Exception as exc:
         print(exc)
@@ -998,9 +989,7 @@ async def leaderboard_pw(interaction: discord.Interaction):
             msg = f"Hi {interaction.user.mention}!\nYou are not registered as a PW member, register yourself first."
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
-        else:
-            msg = mongo.get_leaderboard_pw()
-            
+        else:            
             members = mongo.get_members_pw()
             
             for member in members:
@@ -1021,17 +1010,13 @@ async def leaderboard_pw(interaction: discord.Interaction):
                     embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
                     await channel.send(embed=embed)
             
+            img = mongo.get_leaderboard_pw(datetime)
+            file=discord.File(img, filename="image.png")
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            # embed.add_field(name=f"{committee} Leaderboard:\n", value=msg, inline=False)
-            # await interaction.followup.send(embed=embed)
-            os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\", exist_ok=True)
-            with open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt", "w") as file:
-                file.write(msg)
-            file=discord.File(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt", filename=str(datetime) + "_PW" + ".txt")
-            #embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
-            await interaction.followup.send(file=file)
+            embed.set_image(url="attachment://image.png")
+            await interaction.followup.send(embed=embed, file=file)
             file.close()
-            os.remove(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\reports\\" + str(datetime) + "_PW" + ".txt")
+            os.remove(img)
             
     except Exception as exc:
         print(exc)
