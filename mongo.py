@@ -1,6 +1,8 @@
 import os
+import pathlib
 from pymongo import MongoClient
 from tabulate import tabulate
+from PIL import Image, ImageDraw, ImageFont
 
 try:
     from env import connection_string
@@ -108,7 +110,7 @@ def calc_xp_report_leaderboard(member_id):
         
     return xp
 
-def get_leaderboard(committee_name):
+def get_leaderboard(committee_name, datetime):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
     leaderboard = []
@@ -121,22 +123,28 @@ def get_leaderboard(committee_name):
     for i, member in enumerate(leaderboard):
         leaderboard[i].insert(0, i+1)
         
-    return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+    text = tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="fancy_grid")
+    res = make_img(text, datetime)
+    
+    return res
 
-def get_leaderboard_all():
+def get_leaderboard_all(datetime):
     collection = db["members"]
     members = collection.find({})
     leaderboard = []
     for member in members:
         xp = calc_xp_report_leaderboard(member["member_id"])
-        leaderboard.append([member["member_id"], member["name"], xp])
+        leaderboard.append([member["member_id"], member["name"], member["committee"], xp])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
 
     for i, member in enumerate(leaderboard):
         leaderboard[i].insert(0, i+1)
     
-    return tabulate(leaderboard, headers=["Position", "ID", "Name", "XP"], tablefmt="grid")
+    text = tabulate(leaderboard, headers=["Position", "ID", "Name", "Committee", "XP"], tablefmt="fancy_grid")
+    res = make_img(text, datetime)
+    
+    return res
 
 def add_member(member_id, name, committee):
     collection = db["members"]
@@ -227,7 +235,7 @@ def unregister_pw(discord_id):
     else:
         return 0
     
-def get_leaderboard_pw():
+def get_leaderboard_pw(datetime):
     collection = db["members_pw"]
     members = collection.find({})
     leaderboard = []
@@ -249,7 +257,10 @@ def get_leaderboard_pw():
     for i, member in enumerate(leaderboard):
         leaderboard[i].insert(0, i+1)
 
-    return tabulate(leaderboard, headers=["Position", "Name", "Level", "XP"], tablefmt="grid")
+    text = tabulate(leaderboard, headers=["Position", "Name", "Level", "XP"], tablefmt="fancy_grid")
+    res = make_img(text, datetime)
+    
+    return res
 
 def add_xp_pw(discord_id, xp):
     collection = db["members_pw"]
@@ -278,3 +289,41 @@ def find_member_discord_pw(discord_id):
     collection = db["members_pw"]
     member = collection.find_one({"discord_id": discord_id})
     return member
+
+
+
+def make_img(text, datetime):
+    # Create a new image with a white background
+    line_height = 50
+    line_spacing = 10
+    lines = text.split('\n')
+    height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing) + 25
+    width = max([len(line) for line in lines]) * 30 + 25
+
+    # Create a new image with a white background
+    img = Image.new('RGB', (width, height), color=(25, 25, 26))
+    # Create a new ImageDraw object
+    draw = ImageDraw.Draw(img)
+
+    # Define the fonts to use (change to fonts installed on your system)
+    interval_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
+    consola_font = ImageFont.truetype("consola.ttf", 70)
+
+    # Draw the text on the image
+    y = 10
+    for line in lines:
+        x = 10
+        for char in line:
+            # Use the "consola" font for characters that are not supported by the "Interval Bold" font
+            if not interval_font.getmask(char).getbbox():
+                draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
+            else:
+                draw.text((x, y), char, fill=(255, 255, 255), font=interval_font)
+            x += interval_font.getsize(char)[0]
+        y += line_height + line_spacing
+
+    # Save the image
+    img.save(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png", "PNG")
+    
+    return r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png"
+
