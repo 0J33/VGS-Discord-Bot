@@ -309,7 +309,8 @@ def make_img(text, datetime):
     try:
         ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\fonts\\" + "UBUNTUMONO-REGULAR.TTF", 60)
     except:
-        ubuntu_font = ImageFont.truetype(r"" + str(pathlib.Path(__file__).parent.resolve()) + "/fonts/" + "UBUNTUMONO-REGULAR.TTF", 60)
+        font_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "fonts", "UBUNTUMONO-REGULAR.TTF")
+        ubuntu_font = ImageFont.truetype(font_path, 60)
     consola_font = ImageFont.truetype("consola.ttf", 70)
 
     # Draw the text on the image
