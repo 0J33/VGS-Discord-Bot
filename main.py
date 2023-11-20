@@ -164,7 +164,7 @@ async def my_xp(interaction: discord.Interaction):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/my_xp", exc)
+        excp(interaction, "/my_xp", exc)
         
 @client.tree.command(name="committee_report", description="See a report about committee")
 @app_commands.describe(committee = "Enter a committee")
@@ -222,7 +222,7 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
         print(exc)
-        exc(interaction, "/commitee_report " + str(committee), exc)
+        excp(interaction, "/commitee_report " + str(committee), exc)
 
 @client.tree.command(name="list_ids", description="List ids of all members in a comittee")
 @app_commands.describe(committee = "Enter a committee")
@@ -263,7 +263,7 @@ async def list_ids(interaction: discord.Interaction, committee: discord.app_comm
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/list_ids " + str(committee), exc)
+        excp(interaction, "/list_ids " + str(committee), exc)
   
 @client.tree.command(name="register_self", description="Register yourself as a member")
 @app_commands.describe(member_id = "Enter your member id")
@@ -297,7 +297,7 @@ async def register_self(interaction: discord.Interaction, member_id: str):
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
         print(exc)
-        exc(interaction, "/register_self " + str(member_id), exc)
+        excp(interaction, "/register_self " + str(member_id), exc)
    
 @client.tree.command(name="unregister_self", description="Unregister yourself as a member")
 async def unregister_self(interaction: discord.Interaction):
@@ -325,7 +325,7 @@ async def unregister_self(interaction: discord.Interaction):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/unregister_self", exc)
+        excp(interaction, "/unregister_self", exc)
    
 @client.tree.command(name="register_member", description="Register a member")
 @app_commands.describe(member_id = "Enter a member id", member_mention = "Mention a member")
@@ -377,7 +377,7 @@ async def register_member(interaction: discord.Interaction, member_id: str, memb
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/register_member " + str(member_id) + " " + str(member_mention.id), exc)
+        excp(interaction, "/register_member " + str(member_id) + " " + str(member_mention.id), exc)
    
 @client.tree.command(name="unregister_member", description="Unregister a member")
 @app_commands.describe(member_mention = "Mention a member")
@@ -425,7 +425,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/unregister_member " + str(member_mention.id), exc)
+        excp(interaction, "/unregister_member " + str(member_mention.id), exc)
 
 @client.tree.command(name="leaderboard", description="Check the leaderboard for a committee")
 @app_commands.describe(committee = "Enter a committee")
@@ -477,7 +477,7 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/leaderboard", exc)
+        excp(interaction, "/leaderboard", exc)
         
 @client.tree.command(name="leaderboard_all", description="Check the leaderboard for all committees")
 async def leaderboard_all(interaction: discord.Interaction):
@@ -515,7 +515,7 @@ async def leaderboard_all(interaction: discord.Interaction):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/leaderboard_all", exc)
+        excp(interaction, "/leaderboard_all", exc)
         
 @client.tree.command(name="add_member", description="Add a new member")
 @app_commands.describe(committee = "Enter a committee")
@@ -573,7 +573,7 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/add_member", exc)
+        excp(interaction, "/add_member", exc)
         
 @client.tree.command(name="edit_member", description="Edit a member's details")
 @app_commands.describe(committee = "Enter a committee")
@@ -637,7 +637,7 @@ async def edit_member(interaction: discord.Interaction, member_id: str, name: st
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/edit_member", exc)
+        excp(interaction, "/edit_member", exc)
         
 @client.tree.command(name="remove_member", description="Remove a member")
 async def remove_member(interaction: discord.Interaction, member_id: str):
@@ -680,7 +680,7 @@ async def remove_member(interaction: discord.Interaction, member_id: str):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/remove_member", exc)
+        excp(interaction, "/remove_member", exc)
         
 @client.tree.command(name="all_tasks", description="View all tasks")
 async def all_tasks(interaction: discord.Interaction):
@@ -733,7 +733,7 @@ async def all_tasks(interaction: discord.Interaction):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/all_tasks", exc)
+        excp(interaction, "/all_tasks", exc)
 
 @client.tree.command(name="add_task", description="Add a task")
 @app_commands.describe(committee = "Enter a committee")
@@ -824,7 +824,7 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/add_task", exc)
+        excp(interaction, "/add_task", exc)
 
 @client.tree.command(name="remove_task", description="Remove a task")
 async def remove_task(interaction: discord.Interaction, task_id: str):
@@ -867,7 +867,7 @@ async def remove_task(interaction: discord.Interaction, task_id: str):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/remove_task", exc)
+        excp(interaction, "/remove_task", exc)
 
 @client.tree.command(name="register_pw", description="Register as a PW member")
 async def register_pw(interaction: discord.Interaction, name: str):
@@ -894,7 +894,7 @@ async def register_pw(interaction: discord.Interaction, name: str):
             print(exc)
             msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
             await interaction.followup.send(msg)
-            exc(interaction, "/register_pw", exc)
+            excp(interaction, "/register_pw", exc)
 
 @client.tree.command(name="unregister_pw", description="Unregister as a PW member")
 async def unregister_pw(interaction: discord.Interaction):
@@ -921,7 +921,7 @@ async def unregister_pw(interaction: discord.Interaction):
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         await interaction.followup.send(msg)
-        exc(interaction, "/unregister_pw", exc)
+        excp(interaction, "/unregister_pw", exc)
 
 @client.tree.command(name="my_xp_pw", description="Check your xp as a PW member")
 async def my_xp_pw(interaction: discord.Interaction):
@@ -965,7 +965,7 @@ async def my_xp_pw(interaction: discord.Interaction):
         print(exc)
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         await interaction.followup.send(msg)
-        exc(interaction, "/my_xp_pw", exc)
+        excp(interaction, "/my_xp_pw", exc)
 
 @client.tree.command(name="leaderboard_pw", description="Check the leaderboard for PW members")
 async def leaderboard_pw(interaction: discord.Interaction):
@@ -1023,7 +1023,7 @@ async def leaderboard_pw(interaction: discord.Interaction):
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction ,"/leaderboard_pw", exc)
+        excp(interaction ,"/leaderboard_pw", exc)
 
 @client.tree.command(name="add_xp_pw", description="Add XP to a PW member")
 async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: discord.Member):
@@ -1086,7 +1086,7 @@ async def add_xp_pw(interaction: discord.Interaction, xp: int, member_mention: d
         msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
         embed = discord.Embed(title="", description=msg, colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
-        exc(interaction, "/add_pw_xp", exc)
+        excp(interaction, "/add_pw_xp", exc)
 
 @client.tree.command(name="add_bounty", description="Add a bounty")
 @app_commands.describe(bounty_board = "Choose a bounty board")
@@ -1147,7 +1147,7 @@ async def add_bounty(interaction: discord.Interaction, bounty_name: str, xp_rang
             msg= f"Hi {interaction.user.mention}!\nAn error occured. Please try again."
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
-            exc(interaction, "/add_bounty", exc)
+            excp(interaction, "/add_bounty", exc)
 
 
 
