@@ -324,7 +324,10 @@ def make_img(text, datetime):
                 draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
             else:
                 draw.text((x, y), char, fill=(255, 255, 255), font=ubuntu_font)
-            x += ubuntu_font.getsize(char)[0]
+            try:
+                x += ubuntu_font.getsize(char)[0]
+            except:
+                x += 30
         y += line_height + line_spacing
 
     # Save the image
@@ -332,3 +335,4 @@ def make_img(text, datetime):
     
     return r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\res\\" + datetime + ".png"
 
+get_leaderboard_pw("test")
