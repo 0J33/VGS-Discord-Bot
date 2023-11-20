@@ -314,6 +314,9 @@ def make_img(text, datetime):
         # dont use fonts
         ubuntu_font = ImageFont.load_default()
         consola_font = ImageFont.load_default()
+        # font size
+        ubuntu_font.size = 60
+        consola_font.size = 70
 
     # Draw the text on the image
     y = 10
@@ -325,7 +328,10 @@ def make_img(text, datetime):
                 draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
             else:
                 draw.text((x, y), char, fill=(255, 255, 255), font=ubuntu_font)
-            x += ubuntu_font.getsize(char)[0]
+            try:
+                x += ubuntu_font.getsize(char)[0]
+            except:
+                x += 30
         y += line_height + line_spacing
 
     # Save the image
