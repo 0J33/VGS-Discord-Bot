@@ -78,7 +78,7 @@ def calc_xp_report(member_id):
     report = ""
     for task in tasks:
         xp += task["xp"]
-        if "attendance" in task["justification"].lower():
+        if task["attendance"] == True:
             attendance += 1
         report += f"{task['justification']}: {task['xp']} XP" + "\n"
         
@@ -185,6 +185,7 @@ def get_all_tasks():
         msg += f"Members: \n{tabulate(members, headers=['Name', 'ID'], tablefmt='grid')}\n"
         msg += f"Justification: {task['justification']}\n"
         msg += f"XP: {task['xp']}\n"
+        msg += f"Attendance: {task['attendance']}\n"
         msg += "----------------------------------\n\n"
     return msg
         

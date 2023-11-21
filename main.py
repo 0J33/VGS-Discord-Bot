@@ -748,7 +748,12 @@ async def all_tasks(interaction: discord.Interaction):
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
 ])
-async def add_task(interaction: discord.Interaction, xp: int, justification: str, committee: discord.app_commands.Choice[int]):
+@app_commands.describe(attendance = "Is the xp for attendance?")
+@app_commands.choices(attendance=[
+    discord.app_commands.Choice(name="Yes", value=0),
+    discord.app_commands.Choice(name="No", value=1)
+])
+async def add_task(interaction: discord.Interaction, xp: int, justification: str, committee: discord.app_commands.Choice[int], attendance: discord.app_commands.Choice[int]):
     
     await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
@@ -757,6 +762,16 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
         committee = committee.name
     except:
         committee = None
+        
+    try:
+        attendance = attendance.name
+    except:
+        attendance = "No"
+        
+    if attendance == "Yes":
+        attendance = True
+    elif attendance == "No":
+        attendance = False
 
     await log(interaction, "/add_task")
     
@@ -806,7 +821,7 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
                 option = f"{option[0]} - {option[1]}"
                 select.append_option(discord.SelectOption(label=option, value=option))
 
-            select.callback = lambda i: handle_select_add_task(i, member_id, xp, justification, committee)
+            select.callback = lambda i: handle_select_add_task(i, member_id, xp, justification, committee, attendance)
             
             view = discord.ui.View(timeout=None)
             view.add_item(select)

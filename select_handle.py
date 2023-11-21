@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.ui import Select
 import mongo
 
-async def handle_select_add_task(interaction: discord.Interaction, member_id, xp, justification, committee):
+async def handle_select_add_task(interaction: discord.Interaction, member_id, xp, justification, committee, attendance):
     
     selected_option = interaction.data['values']
     
@@ -16,7 +16,7 @@ async def handle_select_add_task(interaction: discord.Interaction, member_id, xp
         member = member.split(' - ')[1]
         member_ids.append(member)
     
-    task = mongo.add_task(member_id, xp, justification, member_ids)
+    task = mongo.add_task(member_id, xp, justification, member_ids, attendance)
     if task:
         msg = f"Task {task} added successfully!"
     else: 
