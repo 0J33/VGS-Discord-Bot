@@ -9,23 +9,8 @@ load_dotenv()
 connection_string = os.getenv("connection_string")
     
 client = MongoClient(connection_string)
-db = client["vgs"]
+db = client["vgs_test"]
 
-def export_to_json():
-    data = {}
-    for collection in db.list_collection_names():
-        data[collection] = list(db[collection].find({}))
-        
-    with open('vgs_db.json', 'w') as f:
-        json.dump(data, f, default=json_util.default)
-        
-def import_from_json():
-    with open('vgs_db.json', 'r') as f:
-        data = json.load(f)
-        for collection, docs in data.items():
-            db[collection].insert_many(docs)
-            
-        
 # def import_logs_from_txt():    
 #     collection = db["logs"]
     
@@ -42,4 +27,24 @@ def import_from_json():
 #         if (line + 6) < len(split_logs):
 #             line += 4
 #     f.close()
+
+def export_to_json():
+    data = {}
+    for collection in db.list_collection_names():
+        data[collection] = list(db[collection].find({}))
+        
+    with open('vgs_db.json', 'w') as f:
+        json.dump(data, f, default=json_util.default)
+        
+def import_from_json():
+    with open('vgs_db.json', 'r') as f:
+        data = json.load(f)
+        for collection, docs in data.items():
+            if len(docs) > 0:
+                for doc in docs:
+                    for key, value in doc.items():
+                        if isinstance(value, dict) and "$oid" in value:
+                            doc[key] = json_util.loads(json.dumps(value))
+                    if not db[collection].find_one(doc):
+                        db[collection].insert_one(doc)
     
