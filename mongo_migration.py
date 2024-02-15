@@ -9,7 +9,7 @@ load_dotenv()
 connection_string = os.getenv("connection_string")
     
 client = MongoClient(connection_string)
-db = client["vgs_test"]
+db = client["vgs"]
 
 # def import_logs_from_txt():    
 #     collection = db["logs"]
