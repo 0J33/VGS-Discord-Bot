@@ -5,10 +5,7 @@ from tabulate import tabulate
 from PIL import Image, ImageDraw, ImageFont
 from urllib.request import urlopen
 
-try:
-    from env import connection_string
-except:
-    connection_string = os.getenv("CONNECTION_STRING")
+connection_string = os.getenv("connection_string")
     
 client = MongoClient(connection_string)
 db = client["vgs"]

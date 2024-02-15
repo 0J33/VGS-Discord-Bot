@@ -1,33 +1,20 @@
 import gspread
 import os
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
     
 from tabulate import tabulate
 
-#get env vars from env.py (.env not working)
-try:
-    from env import str_type
-    from env import str_project_id
-    from env import str_private_key_id
-    from env import str_private_key
-    from env import str_client_email
-    from env import str_client_id
-    from env import str_auth_uri
-    from env import str_token_uri
-    from env import str_auth_provider_x509_cert_url
-    from env import str_client_x509_cert_url
-except:
-    str_type = os.getenv("TYPE")
-    str_project_id = os.getenv("PROJECT_ID")
-    str_private_key_id = os.getenv("PRIVATE_KEY_ID")
-    str_private_key = os.getenv("PRIVATE_KEY")
-    str_client_email = os.getenv("CLIENT_EMAIL")
-    str_client_id = os.getenv("CLIENT_ID")
-    str_auth_uri = os.getenv("AUTH_URI")
-    str_token_uri = os.getenv("TOKEN_URI")
-    str_auth_provider_x509_cert_url = os.getenv("AUTH_PROVIDER_X509_CERT_URL")
-    str_client_x509_cert_url = os.getenv("CLIENT_X509_CERT_URL")
+str_type = os.getenv("type")
+str_project_id = os.getenv("project_id")
+str_private_key_id = os.getenv("private_key_id")
+str_private_key = os.getenv("private_key")
+str_client_email = os.getenv("client_email")
+str_client_id = os.getenv("client_id")
+str_auth_uri = os.getenv("auth_uri")
+str_token_uri = os.getenv("token_uri")
+str_auth_provider_x509_cert_url = os.getenv("auth_provider_x509_cert_url")
+str_client_x509_cert_url = os.getenv("client_x509_cert_url")
 
 # import datetime
 # from gspread_formatting import *

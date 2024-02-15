@@ -1,6 +1,6 @@
-env.py
 __pycache__/
 reports/
 logs.txt
 exc.txt
 test/
+.env

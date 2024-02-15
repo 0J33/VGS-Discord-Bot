@@ -1,5 +1,6 @@
 import asyncio
 import os
+from dotenv import load_dotenv
 #import re
 #import sys
 import discord
@@ -11,6 +12,8 @@ from time import time, ctime
 #import datetime
 import pathlib
 
+from pymongo import MongoClient
+
 # import gspread
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -19,13 +22,10 @@ import mongo
 import select_handle
 from select_handle import *
 
+load_dotenv()
 
 #bot token
-try:
-    from env import str_TOKEN
-    TOKEN = str_TOKEN
-except:
-    TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("token")
 #keep bot alive
 from keep_alive import keep_alive
 
@@ -34,7 +34,10 @@ intents = discord.Intents.all()
 #create bot client
 client = commands.AutoShardedBot(command_prefix=";", help_command = None, intents = intents)
 
+connection_string = os.getenv("connection_string")
 
+client = MongoClient(connection_string)
+db = client["vgs"]
 
 #get the time
 async def get_time():
@@ -45,19 +48,16 @@ async def log(interaction, message):
     #get the time
     datetime = await get_time()
     #log the command used
-    testf = open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\logs.txt","a")
-    testf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(datetime) + "\n\n")
-    testf.close()
+    collection = db['logs']
+    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'datetime': str(datetime)})
 
 #method that handles exception messages
 async def excp(interaction, message, exc):
     #get the time
     datetime = await get_time()
     #log the command and exception
-    excf = open(r"" + str(pathlib.Path(__file__).parent.resolve())+ "\\exc.txt","a")
-    excf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
-    excf.close()
-    return
+    collection = db['excp']
+    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'exception': str(exc), 'datetime': str(datetime)})
 
 #bot activity and login message
 @client.event
