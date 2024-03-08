@@ -530,7 +530,7 @@ async def leaderboard_all(interaction: discord.Interaction):
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
 ])
-async def add_member(interaction: discord.Interaction, member_id: str, name: str, committee: discord.app_commands.Choice[int]):
+async def add_member(interaction: discord.Interaction,committee: discord.app_commands.Choice[int], name: str, member_id: str = None):
     
     await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
@@ -557,6 +557,8 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
         
         #check if user is admin/tech or regular member and set the correct help message
         if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            if member_id == None:
+                member_id = mongo.get_new_member_id(committee)
             member = mongo.add_member(member_id, name, committee)
             if member:
                 msg = f"Member {member_id} already exists."
