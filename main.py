@@ -1,23 +1,13 @@
 import asyncio
 import os
 from dotenv import load_dotenv
-#import re
-#import sys
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import Select
 from time import time, ctime
-#from datetime import datetime
-#import datetime
 import pathlib
-
 from pymongo import MongoClient
-
-# import gspread
-#from dotenv import load_dotenv
-#load_dotenv()
-# import mongo
 import mongo
 import select_handle
 from select_handle import *
@@ -173,7 +163,7 @@ async def my_xp(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -231,7 +221,7 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -434,7 +424,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -524,7 +514,7 @@ async def leaderboard_all(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -584,7 +574,7 @@ async def add_member(interaction: discord.Interaction,committee: discord.app_com
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -744,7 +734,7 @@ async def all_tasks(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),

@@ -1,5 +1,7 @@
 __pycache__/
 reports/
 test/
+tasks/
+res/
 .env
 vgs_db.json

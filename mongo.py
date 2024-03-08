@@ -145,17 +145,28 @@ def get_leaderboard_all(datetime):
     return res
 
 def get_new_member_id(committee):
+    committees = {
+        "BOARD": "1",
+        "CL": "2",
+        "SM": "3",
+        "FR": "4",
+        "EP": "5",
+        "MD": "6",
+        "GAD": "7",
+        "GDD": "8",
+        "GSD": "9"
+    }
     collection = db["members"]
     members = collection.find({"committee": committee})
     ids = []
     for member in members:
-        ids.append(member["member_id"])
+        ids.append(int(member["member_id"]))
     if len(ids) == 0:
-        return committee + "1"
+        return committees[committee] + "01"
     else:
         ids.sort()
-        return committee + str(int(ids[-1][-1]) + 1)
-
+        return committees[committee] + str(ids[-1] + 1).zfill(2)
+    
 def add_member(member_id, name, committee):
     collection = db["members"]
     if find_member(member_id) is not None:
