@@ -15,7 +15,7 @@ from select_handle import *
 load_dotenv()
 
 #bot token
-TOKEN = os.getenv("token")
+TOKEN = os.getenv("str_TOKEN")
 #keep bot alive
 from keep_alive import keep_alive
 
@@ -26,8 +26,9 @@ client = commands.AutoShardedBot(command_prefix=";", help_command = None, intent
 
 connection_string = os.getenv("connection_string")
 
-client = MongoClient(connection_string)
-db = client["vgs"]
+# client = MongoClient(connection_string)
+mongo_client = MongoClient(connection_string)
+db = mongo_client["vgs"]
 
 #get the time
 async def get_time():
