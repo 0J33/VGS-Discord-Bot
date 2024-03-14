@@ -1,6 +1,7 @@
-env.py
 __pycache__/
 reports/
-logs.txt
-exc.txt
 test/
+tasks/
+res/
+.env
+vgs_db.json

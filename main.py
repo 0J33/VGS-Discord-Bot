@@ -1,31 +1,21 @@
 import asyncio
 import os
-#import re
-#import sys
+from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import Select
 from time import time, ctime
-#from datetime import datetime
-#import datetime
 import pathlib
-
-# import gspread
-#from dotenv import load_dotenv
-#load_dotenv()
-# import mongo
+from pymongo import MongoClient
 import mongo
 import select_handle
 from select_handle import *
 
+load_dotenv()
 
 #bot token
-try:
-    from env import str_TOKEN
-    TOKEN = str_TOKEN
-except:
-    TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("str_TOKEN")
 #keep bot alive
 from keep_alive import keep_alive
 
@@ -34,7 +24,11 @@ intents = discord.Intents.all()
 #create bot client
 client = commands.AutoShardedBot(command_prefix=";", help_command = None, intents = intents)
 
+connection_string = os.getenv("connection_string")
 
+# client = MongoClient(connection_string)
+mongo_client = MongoClient(connection_string)
+db = mongo_client["vgs"]
 
 #get the time
 async def get_time():
@@ -45,19 +39,16 @@ async def log(interaction, message):
     #get the time
     datetime = await get_time()
     #log the command used
-    testf = open(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\logs.txt","a")
-    testf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(datetime) + "\n\n")
-    testf.close()
+    collection = db['logs']
+    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'datetime': str(datetime)})
 
 #method that handles exception messages
 async def excp(interaction, message, exc):
     #get the time
     datetime = await get_time()
     #log the command and exception
-    excf = open(r"" + str(pathlib.Path(__file__).parent.resolve())+ "\\exc.txt","a")
-    excf.write('{}'.format(interaction.user.name) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
-    excf.close()
-    return
+    collection = db['excp']
+    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'exception': str(exc), 'datetime': str(datetime)})
 
 #bot activity and login message
 @client.event
@@ -173,7 +164,7 @@ async def my_xp(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -231,7 +222,7 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -434,7 +425,7 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -524,13 +515,13 @@ async def leaderboard_all(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
 ])
-async def add_member(interaction: discord.Interaction, member_id: str, name: str, committee: discord.app_commands.Choice[int]):
+async def add_member(interaction: discord.Interaction,committee: discord.app_commands.Choice[int], name: str, member_id: str = None):
     
     await interaction.response.defer(ephemeral=True)
     await asyncio.sleep(1)
@@ -557,6 +548,8 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
         
         #check if user is admin/tech or regular member and set the correct help message
         if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
+            if member_id == None:
+                member_id = mongo.get_new_member_id(committee)
             member = mongo.add_member(member_id, name, committee)
             if member:
                 msg = f"Member {member_id} already exists."
@@ -582,7 +575,7 @@ async def add_member(interaction: discord.Interaction, member_id: str, name: str
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
@@ -742,7 +735,7 @@ async def all_tasks(interaction: discord.Interaction):
     discord.app_commands.Choice(name="CL", value=2),
     discord.app_commands.Choice(name="SM", value=3),
     discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="HR", value=5),
+    discord.app_commands.Choice(name="EP", value=5),
     discord.app_commands.Choice(name="MD", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),

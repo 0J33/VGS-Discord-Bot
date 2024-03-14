@@ -5,13 +5,10 @@ from tabulate import tabulate
 from PIL import Image, ImageDraw, ImageFont
 from urllib.request import urlopen
 
-try:
-    from env import connection_string
-except:
-    connection_string = os.getenv("CONNECTION_STRING")
+connection_string = os.getenv("connection_string")
     
-client = MongoClient(connection_string)
-db = client["vgs"]
+mongo_client = MongoClient(connection_string)
+db = mongo_client["vgs"]
 
 def find_member(member_id):
     collection = db["members"]
@@ -147,6 +144,29 @@ def get_leaderboard_all(datetime):
     
     return res
 
+def get_new_member_id(member_committee):
+    committees_list = {
+        "BOARD": "1",
+        "CL": "2",
+        "SM": "3",
+        "FR": "4",
+        "EP": "5",
+        "MD": "6",
+        "GAD": "7",
+        "GDD": "8",
+        "GSD": "9"
+    }
+    collection = db["members"]
+    members = collection.find({"committee": member_committee})
+    ids = []
+    for member in members:
+        ids.append(int(member["member_id"]))
+    if len(ids) == 0:
+        return committees_list[member_committee] + "01"
+    else:
+        ids.sort()
+        return committees_list[member_committee] + str(ids[-1] + 1).zfill(2)
+    
 def add_member(member_id, name, committee):
     collection = db["members"]
     if find_member(member_id) is not None:
