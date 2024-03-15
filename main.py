@@ -7,7 +7,6 @@ from discord.ext import commands
 from discord.ui import Select
 from time import time, ctime
 import pathlib
-from pymongo import MongoClient
 import mongo
 import select_handle
 from select_handle import *
@@ -24,12 +23,6 @@ intents = discord.Intents.all()
 #create bot client
 client = commands.AutoShardedBot(command_prefix=";", help_command = None, intents = intents)
 
-connection_string = os.getenv("connection_string")
-
-# client = MongoClient(connection_string)
-mongo_client = MongoClient(connection_string)
-db = mongo_client["vgs"]
-
 #get the time
 async def get_time():
   return ctime(time())
@@ -39,16 +32,14 @@ async def log(interaction, message):
     #get the time
     datetime = await get_time()
     #log the command used
-    collection = db['logs']
-    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'datetime': str(datetime)})
+    mongo.log(str('{}'.format(interaction.user.name)), str(message), str(datetime))
 
 #method that handles exception messages
 async def excp(interaction, message, exc):
     #get the time
     datetime = await get_time()
     #log the command and exception
-    collection = db['excp']
-    collection.insert_one({'user': '{}'.format(interaction.user.name), 'command': str(message), 'exception': str(exc), 'datetime': str(datetime)})
+    mongo.excp(str('{}'.format(interaction.user.name)), str(message), str(exc), str(datetime))
 
 #bot activity and login message
 @client.event

@@ -1,14 +1,25 @@
 import os
+from dotenv import load_dotenv
 import pathlib
 from pymongo import MongoClient
 from tabulate import tabulate
 from PIL import Image, ImageDraw, ImageFont
 from urllib.request import urlopen
 
+load_dotenv()
+
 connection_string = os.getenv("connection_string")
     
 mongo_client = MongoClient(connection_string)
 db = mongo_client["vgs"]
+
+def log(user, message, datetime):
+    collection = db['logs']
+    collection.insert_one({'user': user, 'command': message, 'datetime': datetime})
+    
+def excp(user, message, exception, datetime):
+    collection = db['excp']
+    collection.insert_one({'user': user, 'command': message, 'exception': exception, 'datetime': datetime})
 
 def find_member(member_id):
     collection = db["members"]
