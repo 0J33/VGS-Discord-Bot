@@ -40,27 +40,21 @@ def list_ids(committee_name):
     members_parsed += "```"
     return members_parsed
 
-def register(member_id, discord_id, admin):
-    member = find_member_discord(discord_id)
-    if member is not None:
-        # this person is already registered with an id
-        return 1
-    
+def register(discord_id, committee):
     collection = db["members"]
-    member = collection.find_one({"member_id": member_id})
-    if member is None:
-        # member id does not exist at all
-        return 3
-    
-    if member["discord_id"] is not None:
-        if admin:
-            collection.update_one({"member_id": member_id}, {"$set": {"discord_id": discord_id}})
+    member = collection.find_one({"discord_id": discord_id})
+    if member is not None:
+        if member["unregistered"] == True:
+            # this person was registered before but unregistered
+            collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}})
             return 0
-        # id already registered by another person
-        return 2
-    
+        else:
+            # this person is already registered
+            return 1
+
+    member_id = get_new_member_id(committee)
     # successful registration
-    collection.update_one({"member_id": member_id}, {"$set": {"discord_id": discord_id}})
+    collection.insert_one({"member_id": member_id, "discord_id": discord_id})
     return 0
 
 def unregister(discord_id):
@@ -70,7 +64,8 @@ def unregister(discord_id):
         return 1
     
     collection = db["members"]
-    collection.update_one({"discord_id": discord_id}, {"$set": {"discord_id": None}})
+    # add an attribute "unregistered" to the member
+    collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": True}})
     return 0
 
 def calc_xp_report(member_id):
@@ -178,29 +173,29 @@ def get_new_member_id(member_committee):
         ids.sort()
         return committees_list[member_committee] + str(ids[-1] + 1).zfill(2)
     
-def add_member(member_id, name, committee):
-    collection = db["members"]
-    if find_member(member_id) is not None:
-        return 1
-    else:
-        collection.insert_one({"member_id": member_id, "name": name, "committee": committee, "discord_id": None})
-        return 0
+# def add_member(member_id, name, committee):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
+#         return 1
+#     else:
+#         collection.insert_one({"member_id": member_id, "name": name, "committee": committee, "discord_id": None})
+#         return 0
 
-def edit_member(member_id, name, committee):
-    collection = db["members"]
-    if find_member(member_id) is not None:
-        collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
-        return 1
-    else:
-        return 0
+# def edit_member(member_id, name, committee):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
+#         collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
+#         return 1
+#     else:
+#         return 0
 
-def delete_member(member_id):
-    collection = db["members"]
-    if find_member(member_id) is not None:
-        collection.delete_one({"member_id": member_id})
-        return 1
-    else:
-        return 0
+# def delete_member(member_id):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
+#         collection.delete_one({"member_id": member_id})
+#         return 1
+#     else:
+#         return 0
     
 def get_all_tasks():
     collection = db["xp"]
@@ -219,124 +214,11 @@ def get_all_tasks():
         msg += f"Attendance: {task['attendance']}\n"
         msg += "----------------------------------\n\n"
     return msg
-        
-def add_task(member_id, xp, justification, member_ids):
-    collection = db["xp"]
-    try:
-        docs = collection.find({})
-        max_id = 0
-        for doc in docs:
-            if doc["id"] > max_id:
-                max_id = doc["id"]
-        id = max_id + 1
-        collection.insert_one({"id": id, "member_id": member_id, "member_ids": member_ids, "xp": xp, "justification": justification})
-        return 1
-    except:
-        return 0
-
-def delete_task(task_id):
-    collection = db["xp"]
-    if collection.find_one({"id": task_id}) is not None:
-        collection.delete_one({"id": task_id})
-        return 1
-    else:
-        return 0
     
 def get_members_committee(committee):
     collection = db["members"]
     members = collection.find({"committee": committee})
     return members
-
-def find_member_pw(discord_id):
-    collection = db["members_pw"]
-    member = collection.find_one({"discord_id": discord_id})
-    if member["name"] is None:
-        return None
-    return member
-
-def register_pw(discord_id, name):
-    collection = db["members_pw"]
-    # if record exists with the discord_id and name is not None, then return 1
-    if collection.find_one({"discord_id": discord_id}) is not None:
-        if collection.find_one({"discord_id": discord_id})["name"] is not None:
-            return 0
-        else:
-            collection.update_one({"discord_id": discord_id}, {"$set": {"name": name}})
-            return 1
-    else:
-        collection.insert_one({"discord_id": discord_id, "name": name, "level": 1, "xp": 0})
-        return 1
-    
-def unregister_pw(discord_id):
-    collection = db["members_pw"]
-    if collection.find_one({"discord_id": discord_id}) is not None:
-        collection.update_one({"discord_id": discord_id}, {"$set": {"name": None}})
-        return 1
-    else:
-        return 0
-    
-def get_leaderboard_pw(datetime):
-    collection = db["members_pw"]
-    members = collection.find({})
-    leaderboard = []
-    for member in members:
-        if member["name"] is not None:
-            level = member['level']
-            xp = member['xp']
-            to_next_level = 10 * (level ** 2) + (100 * level)
-            while xp >= to_next_level:
-                level += 1
-                to_next_level = 10 * (level ** 2) + (100 * level) # 10 * (lvl ^ 2) + (100 * lvl)
-                
-            if level > member['level']:
-                update_level_pw(member['discord_id'], level)    
-                
-            leaderboard.append([member["name"], member["level"], member["xp"]])
-    
-    leaderboard.sort(key=lambda x: x[2], reverse=True)
-
-    for i, member in enumerate(leaderboard):
-        leaderboard[i].insert(0, i+1)
-
-    text = tabulate(leaderboard, headers=["Position", "Name", "Level", "XP"], tablefmt="fancy_grid")
-    res = make_img(text, datetime)
-    
-    return res
-
-def add_xp_pw(discord_id, xp):
-    collection = db["members_pw"]
-    member = collection.find_one({"discord_id": discord_id})
-    if member is not None and member["name"] is not None:
-        collection.update_one({"discord_id": discord_id}, {"$set": {"xp": member["xp"] + xp}})
-        return 0
-    else:
-        return 1
-    
-def update_level_pw(discord_id, level):
-    collection = db["members_pw"]
-    member = collection.find_one({"discord_id": discord_id})
-    if member is not None and member["name"] is not None:
-        collection.update_one({"discord_id": discord_id}, {"$set": {"level": level}})
-        return 0
-    else:
-        return 1
-    
-def get_members_pw():
-    collection = db["members_pw"]
-    members = collection.find({})
-    for member in members:
-        if member["name"] is None:
-            members.remove(member)
-    return members
-
-def find_member_discord_pw(discord_id):
-    collection = db["members_pw"]
-    member = collection.find_one({"discord_id": discord_id})
-    if member["name"] is None:
-        return None
-    return member
-
-
 
 def make_img(text, datetime):
     # Create a new image with a white background
