@@ -140,12 +140,13 @@ async def my_xp(interaction: discord.Interaction):
 @client.tree.command(name="committee_report", description="See a report about committee")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
@@ -198,12 +199,13 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
 @client.tree.command(name="list_ids", description="List ids of all members in a comittee")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
@@ -239,12 +241,13 @@ async def list_ids(interaction: discord.Interaction, committee: discord.app_comm
 @client.tree.command(name="register_self", description="Register yourself as a member")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
@@ -309,12 +312,13 @@ async def unregister_self(interaction: discord.Interaction):
 @client.tree.command(name="register_member", description="Register a member")
 @app_commands.describe(committee = "Enter a committee", member_mention = "Mention a member")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
@@ -420,12 +424,13 @@ async def unregister_member(interaction: discord.Interaction, member_mention: di
 @client.tree.command(name="leaderboard", description="Check the leaderboard for a committee")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
@@ -563,12 +568,13 @@ async def all_tasks(interaction: discord.Interaction):
 @client.tree.command(name="add_task", description="Add a task")
 @app_commands.describe(committee = "Enter a committee")
 @app_commands.choices(committee=[
-    discord.app_commands.Choice(name="BOARD", value=1),
-    discord.app_commands.Choice(name="CL", value=2),
-    discord.app_commands.Choice(name="SM", value=3),
-    discord.app_commands.Choice(name="FR", value=4),
-    discord.app_commands.Choice(name="EP", value=5),
-    discord.app_commands.Choice(name="MD", value=6),
+    discord.app_commands.Choice(name="BOARD", value=0),
+    discord.app_commands.Choice(name="IT", value=1),
+    discord.app_commands.Choice(name="FE", value=2),
+    discord.app_commands.Choice(name="HR", value=3),
+    discord.app_commands.Choice(name="LOGISTICS", value=4),
+    discord.app_commands.Choice(name="MD", value=5),
+    discord.app_commands.Choice(name="SM", value=6),
     discord.app_commands.Choice(name="GAD", value=7),
     discord.app_commands.Choice(name="GDD", value=8),
     discord.app_commands.Choice(name="GSD", value=9)
