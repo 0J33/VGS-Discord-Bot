@@ -46,16 +46,17 @@ def register(discord_id, committee):
     if member is not None:
         # if member has unregistered attribute
         if "unregistered" not in member:
+            # this person is already registered
+            return 1
+        else:
             if member["unregistered"] == True:
                 # this person was registered before but unregistered
-                collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}, "$set": {"committee": committee}})
+                member_id = get_new_member_id(committee)
+                collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}, "$set": {"committee": committee}, "$set": {"member_id": member_id}})
                 return 0
             else:
                 # this person is already registered
                 return 1
-        else:
-            # this person is already registered
-            return 1
 
     member_id = get_new_member_id(committee)
     # successful registration
@@ -73,14 +74,13 @@ def unregister(discord_id):
     collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": True}})
     return 0
 
-def calc_xp_report(member_id):
+def calc_xp_report(discord_id):
     collection = db["xp"]
     all_tasks = collection.find({})
     tasks = []
     for task in all_tasks:
-        if member_id in task["member_ids"]:
+        if str(discord_id) in task["discord_ids"]:
             tasks.append(task)
-    
     xp = 0
     attendance = 0
     report = ""
@@ -100,18 +100,18 @@ async def get_committee_report(committee, client):
     members = collection.find({"committee": committee})
 
     for member in members:
-        report += member["member_id"] + " " + await get_user_name(member["discord_id"], client) + "\n"
-        report += calc_xp_report(member["member_id"])
+        report += member["discord_id"] + " " + await get_user_name(member["discord_id"], client) + "\n"
+        report += calc_xp_report(member["discord_id"])
     return report
 
-def calc_xp_report_leaderboard(member_id):
+def calc_xp_report_leaderboard(discord_id):
     xp = 0
     
     collection = db["xp"]
     all_tasks = collection.find({})
     tasks = []
     for task in all_tasks:
-        if member_id in task["member_ids"]:
+        if str(discord_id) in task["discord_ids"]:
             tasks.append(task)
     
     for task in tasks:
@@ -124,7 +124,7 @@ async def get_leaderboard(committee_name, datetime, client):
     members = collection.find({"committee": committee_name})
     leaderboard = []
     for member in members:
-        xp = calc_xp_report_leaderboard(member["member_id"])
+        xp = calc_xp_report_leaderboard(member["discord_id"])
         leaderboard.append([member["member_id"], await get_user_name(member["discord_id"], client), xp])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
@@ -142,7 +142,7 @@ async def get_leaderboard_all(datetime, client):
     members = collection.find({})
     leaderboard = []
     for member in members:
-        xp = calc_xp_report_leaderboard(member["member_id"])
+        xp = calc_xp_report_leaderboard(member["discord_id"])
         leaderboard.append([member["member_id"], await get_user_name(member["discord_id"], client), member["committee"], xp])
     
     leaderboard.sort(key=lambda x: x[3], reverse=True)
@@ -163,7 +163,6 @@ async def get_user_name(discord_id, client):
         return nickname
     else:
         return username
-    
 
 def get_new_member_id(member_committee):
     committees_list = {
@@ -197,10 +196,11 @@ async def get_all_tasks(client):
     msg = "=========== ALL TASKS ===========\n\n"
     for task in tasks:
         msg += f"Task ID: {task['id']}\n"
-        msg += f"Member ID: {task['member_id']}\n"
+        user = await get_user_name(task["discord_id"], client)
+        msg += f"User: {user}\n"
         members = []
-        for member_id in task["member_ids"]:
-            member = find_member(member_id)
+        for discord_id in task["discord_ids"]:
+            member = find_member_discord(int(discord_id))
             members.append([await get_user_name(member["discord_id"], client), member["member_id"]])
         msg += f"Members: \n{tabulate(members, headers=['Name', 'ID'], tablefmt='grid')}\n"
         msg += f"Justification: {task['justification']}\n"
@@ -209,7 +209,7 @@ async def get_all_tasks(client):
         msg += "----------------------------------\n\n"
     return msg
     
-def add_task(member_id, xp, justification, member_ids, attendance):
+def add_task(discord_id, xp, justification, discord_ids, attendance):
     collection = db["xp"]
     try:
         docs = collection.find({})
@@ -218,7 +218,7 @@ def add_task(member_id, xp, justification, member_ids, attendance):
             if doc["id"] > max_id:
                 max_id = doc["id"]
         id = max_id + 1
-        collection.insert_one({"id": id, "member_id": member_id, "member_ids": member_ids, "xp": xp, "justification": justification, "attendance": attendance})
+        collection.insert_one({"id": id, "discord_id": discord_id, "discord_ids": discord_ids, "xp": xp, "justification": justification, "attendance": attendance})
         return 1
     except:
         return 0

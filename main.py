@@ -126,7 +126,7 @@ async def my_xp(interaction: discord.Interaction):
         if member is None:
             msg = f"Hi {interaction.user.mention}!\nYou are not registered yet, register yourself first."
         else:
-            msg = mongo.calc_xp_report(member['member_id'])
+            msg = mongo.calc_xp_report(interaction.user.id)
         
         embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
         await interaction.followup.send(embed=embed)
@@ -625,8 +625,8 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
             
             # edit the message to show a view with one select menu that has the names and ids of all the members in that committee
             
-            # get member_id of the user that used the command
-            member_id = mongo.find_member_discord(interaction.user.id)["member_id"]
+            # get discord of the user that used the command
+            discord_id = interaction.user.id
             
             committee_members = mongo.get_members_committee(committee)
             members = []
@@ -651,7 +651,7 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
                 option = f"{option[0]} - {option[1]}"
                 select.append_option(discord.SelectOption(label=option, value=option))
 
-            select.callback = lambda i: handle_select_add_task(i, member_id, xp, justification, committee, attendance)
+            select.callback = lambda i: handle_select_add_task(i, discord_id, xp, justification, committee, attendance)
             
             view = discord.ui.View(timeout=None)
             view.add_item(select)
