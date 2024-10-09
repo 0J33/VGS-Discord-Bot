@@ -354,8 +354,7 @@ async def register_member(interaction: discord.Interaction, committee: discord.a
                 return
 
             #register member or send error message
-            exit_code = mongo.register(
-                committee, member_user.id, True)
+            exit_code = mongo.register(member_user.id, committee)
             if exit_code == 0:
                 msg = f"Hi {interaction.user.mention}!\nMember is now registered!"
             elif exit_code == 1:

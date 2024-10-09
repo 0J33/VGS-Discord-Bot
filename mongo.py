@@ -44,7 +44,8 @@ def register(discord_id, committee):
     collection = db["members"]
     member = collection.find_one({"discord_id": discord_id})
     if member is not None:
-        try:
+        # if member has unregistered attribute
+        if "unregistered" not in member:
             if member["unregistered"] == True:
                 # this person was registered before but unregistered
                 collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}, "$set": {"committee": committee}})
@@ -52,7 +53,7 @@ def register(discord_id, committee):
             else:
                 # this person is already registered
                 return 1
-        except:
+        else:
             # this person is already registered
             return 1
 
@@ -170,10 +171,12 @@ def get_new_member_id(member_committee):
         "CL": "2",
         "SM": "3",
         "FR": "4",
-        "EP": "5",
+        "FE": "5",
         "MD": "6",
-        "GAD": "7",
-        "GDD": "8",
+        "HR": "7",
+        "IT": "8",
+        "GAD": "9",
+        "GDD": "9",
         "GSD": "9"
     }
     collection = db["members"]
