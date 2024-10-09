@@ -95,7 +95,7 @@ async def get_committee_report(committee, client):
     members = collection.find({"committee": committee})
 
     for member in members:
-        report += member["member_id"] + "\t" + await get_user_name(member["discord_id"], client) + "\n"
+        report += member["member_id"] + " " + await get_user_name(member["discord_id"], client) + "\n"
         report += calc_xp_report(member["member_id"])
     return report
 
@@ -154,7 +154,10 @@ async def get_user_name(discord_id, client):
     user = await client.fetch_user(discord_id)
     username = user.name
     nickname = user.global_name
-    return nickname
+    if nickname is not None:
+        return nickname
+    else:
+        return username
     
 
 def get_new_member_id(member_committee):
