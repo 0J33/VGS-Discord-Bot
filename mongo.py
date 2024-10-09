@@ -43,6 +43,7 @@ async def list_ids(committee_name, client):
 def register(discord_id, committee):
     collection = db["members"]
     member = collection.find_one({"discord_id": discord_id})
+    
     if member is not None:
         # if member has unregistered attribute
         if "unregistered" not in member:
