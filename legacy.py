@@ -369,24 +369,26 @@
 #         return None
 #     return member
 
-# def add_task(member_id, xp, justification, member_ids):
-#     collection = db["xp"]
-#     try:
-#         docs = collection.find({})
-#         max_id = 0
-#         for doc in docs:
-#             if doc["id"] > max_id:
-#                 max_id = doc["id"]
-#         id = max_id + 1
-#         collection.insert_one({"id": id, "member_id": member_id, "member_ids": member_ids, "xp": xp, "justification": justification})
+# def add_member(member_id, name, committee):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
 #         return 1
-#     except:
+#     else:
+#         collection.insert_one({"member_id": member_id, "name": name, "committee": committee, "discord_id": None})
 #         return 0
 
-# def delete_task(task_id):
-#     collection = db["xp"]
-#     if collection.find_one({"id": task_id}) is not None:
-#         collection.delete_one({"id": task_id})
+# def edit_member(member_id, name, committee):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
+#         collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
+#         return 1
+#     else:
+#         return 0
+
+# def delete_member(member_id):
+#     collection = db["members"]
+#     if find_member(member_id) is not None:
+#         collection.delete_one({"member_id": member_id})
 #         return 1
 #     else:
 #         return 0

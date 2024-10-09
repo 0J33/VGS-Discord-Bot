@@ -174,7 +174,7 @@ async def committee_report(interaction: discord.Interaction, committee: discord.
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else: 
-            report = mongo.get_committee_report(committee)
+            report = await mongo.get_committee_report(committee, client)
             if report is None:
                 msg = f"Hi {interaction.user.mention}!\n{committee} is not a valid committee"
                 embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
@@ -223,7 +223,7 @@ async def list_ids(interaction: discord.Interaction, committee: discord.app_comm
 
     try:    
         #if commitee invalid then error, else send members id from commitee
-        if (ids := mongo.list_ids(committee)) is not None:
+        if (ids := await mongo.list_ids(committee, client)) is not None:
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             embed.add_field(name=f"{committee} Members:\n", value=ids, inline=False)
             await interaction.followup.send(embed=embed)
@@ -459,7 +459,7 @@ async def leaderboard(interaction: discord.Interaction, committee: discord.app_c
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else:
-            img = mongo.get_leaderboard(committee, datetime)
+            img = await mongo.get_leaderboard(committee, datetime, client)
             file=discord.File(img, filename="image.png")
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             embed.set_image(url="attachment://image.png")
@@ -497,7 +497,7 @@ async def leaderboard_all(interaction: discord.Interaction):
             embed = discord.Embed(title="", description=msg,colour=discord.Color.from_rgb(25, 25, 26))
             await interaction.followup.send(embed=embed)
         else:
-            img = mongo.get_leaderboard_all(datetime)
+            img = await mongo.get_leaderboard_all(datetime, client)
             file=discord.File(img, filename="image.png")
             embed = discord.Embed(title="", description=" ",colour=discord.Color.from_rgb(25, 25, 26))
             embed.set_image(url="attachment://image.png")
@@ -537,7 +537,7 @@ async def all_tasks(interaction: discord.Interaction):
         
         #check if user is admin/tech or regular member and set the correct help message
         if admin_role in interaction.user.roles or board_role in interaction.user.roles or tech_role in interaction.user.roles or interaction.user.id == 611941090429239306:
-            tasks = mongo.get_all_tasks()
+            tasks = await mongo.get_all_tasks(client)
             if tasks:
                 msg = tasks
                 os.makedirs(r"" + str(pathlib.Path(__file__).parent.resolve()) + "\\tasks\\", exist_ok=True)
@@ -632,7 +632,7 @@ async def add_task(interaction: discord.Interaction, xp: int, justification: str
             committee_members = mongo.get_members_committee(committee)
             members = []
             for member in committee_members:
-                members.append([member["name"], member["member_id"]])
+                members.append([await mongo.get_user_name(member["discord_id"], client), member["member_id"]])
                 
             embed=None
             options = members

@@ -31,12 +31,12 @@ def find_member_discord(discord_id):
     member = collection.find_one({"discord_id": discord_id})
     return member
 
-def list_ids(committee_name):
+async def list_ids(committee_name, client):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
     members_parsed = "```"
     for member in members:
-        members_parsed = members_parsed + member["member_id"] + "\t" + member["name"] + "\n"
+        members_parsed = members_parsed + member["member_id"] + "\t" + await get_user_name(member["discord_id"], client) + "\n"
     members_parsed += "```"
     return members_parsed
 
@@ -54,7 +54,7 @@ def register(discord_id, committee):
 
     member_id = get_new_member_id(committee)
     # successful registration
-    collection.insert_one({"member_id": member_id, "discord_id": discord_id})
+    collection.insert_one({"member_id": member_id, "committee": committee, "discord_id": discord_id})
     return 0
 
 def unregister(discord_id):
@@ -89,13 +89,13 @@ def calc_xp_report(member_id):
     report += f"Total XP is {xp}\n\n\n"
     return report
         
-def get_committee_report(committee):
+async def get_committee_report(committee, client):
     report = f"=========== {committee} COMMITTEE REPORT ===========\n\n"
     collection = db["members"]
     members = collection.find({"committee": committee})
 
     for member in members:
-        report += member["member_id"] + "\t" + member["name"] + "\n"
+        report += member["member_id"] + "\t" + await get_user_name(member["discord_id"], client) + "\n"
         report += calc_xp_report(member["member_id"])
     return report
 
@@ -114,13 +114,13 @@ def calc_xp_report_leaderboard(member_id):
         
     return xp
 
-def get_leaderboard(committee_name, datetime):
+async def get_leaderboard(committee_name, datetime, client):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
     leaderboard = []
     for member in members:
         xp = calc_xp_report_leaderboard(member["member_id"])
-        leaderboard.append([member["member_id"], member["name"], xp])
+        leaderboard.append([member["member_id"], await get_user_name(member["discord_id"], client), xp])
     
     leaderboard.sort(key=lambda x: x[2], reverse=True)
 
@@ -132,15 +132,15 @@ def get_leaderboard(committee_name, datetime):
     
     return res
 
-def get_leaderboard_all(datetime):
+async def get_leaderboard_all(datetime, client):
     collection = db["members"]
     members = collection.find({})
     leaderboard = []
     for member in members:
         xp = calc_xp_report_leaderboard(member["member_id"])
-        leaderboard.append([member["member_id"], member["name"], member["committee"], xp])
+        leaderboard.append([member["member_id"], await get_user_name(member["discord_id"], client), member["committee"], xp])
     
-    leaderboard.sort(key=lambda x: x[2], reverse=True)
+    leaderboard.sort(key=lambda x: x[3], reverse=True)
 
     for i, member in enumerate(leaderboard):
         leaderboard[i].insert(0, i+1)
@@ -149,6 +149,13 @@ def get_leaderboard_all(datetime):
     res = make_img(text, datetime)
     
     return res
+
+async def get_user_name(discord_id, client):
+    user = await client.fetch_user(discord_id)
+    username = user.name
+    nickname = user.global_name
+    return nickname
+    
 
 def get_new_member_id(member_committee):
     committees_list = {
@@ -171,33 +178,10 @@ def get_new_member_id(member_committee):
         return committees_list[member_committee] + "01"
     else:
         ids.sort()
-        return committees_list[member_committee] + str(ids[-1] + 1).zfill(2)
+        return str(int(ids[-1]) + 1)
+        # return committees_list[member_committee] + str(ids[-1] + 1).zfill(2)
     
-# def add_member(member_id, name, committee):
-#     collection = db["members"]
-#     if find_member(member_id) is not None:
-#         return 1
-#     else:
-#         collection.insert_one({"member_id": member_id, "name": name, "committee": committee, "discord_id": None})
-#         return 0
-
-# def edit_member(member_id, name, committee):
-#     collection = db["members"]
-#     if find_member(member_id) is not None:
-#         collection.update_one({"member_id": member_id}, {"$set": {"name": name, "committee": committee}})
-#         return 1
-#     else:
-#         return 0
-
-# def delete_member(member_id):
-#     collection = db["members"]
-#     if find_member(member_id) is not None:
-#         collection.delete_one({"member_id": member_id})
-#         return 1
-#     else:
-#         return 0
-    
-def get_all_tasks():
+async def get_all_tasks(client):
     collection = db["xp"]
     tasks = collection.find({})
     msg = "=========== ALL TASKS ===========\n\n"
@@ -207,13 +191,35 @@ def get_all_tasks():
         members = []
         for member_id in task["member_ids"]:
             member = find_member(member_id)
-            members.append([member["name"], member["member_id"]])
+            members.append([await get_user_name(member["discord_id"], client), member["member_id"]])
         msg += f"Members: \n{tabulate(members, headers=['Name', 'ID'], tablefmt='grid')}\n"
         msg += f"Justification: {task['justification']}\n"
         msg += f"XP: {task['xp']}\n"
         msg += f"Attendance: {task['attendance']}\n"
         msg += "----------------------------------\n\n"
     return msg
+    
+def add_task(member_id, xp, justification, member_ids, attendance):
+    collection = db["xp"]
+    try:
+        docs = collection.find({})
+        max_id = 0
+        for doc in docs:
+            if doc["id"] > max_id:
+                max_id = doc["id"]
+        id = max_id + 1
+        collection.insert_one({"id": id, "member_id": member_id, "member_ids": member_ids, "xp": xp, "justification": justification, "attendance": attendance})
+        return 1
+    except:
+        return 0
+
+def delete_task(task_id):
+    collection = db["xp"]
+    if collection.find_one({"id": task_id}) is not None:
+        collection.delete_one({"id": task_id})
+        return 1
+    else:
+        return 0
     
 def get_members_committee(committee):
     collection = db["members"]
