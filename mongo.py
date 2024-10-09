@@ -44,11 +44,15 @@ def register(discord_id, committee):
     collection = db["members"]
     member = collection.find_one({"discord_id": discord_id})
     if member is not None:
-        if member["unregistered"] == True:
-            # this person was registered before but unregistered
-            collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}})
-            return 0
-        else:
+        try:
+            if member["unregistered"] == True:
+                # this person was registered before but unregistered
+                collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": False}, "$set": {"committee": committee}})
+                return 0
+            else:
+                # this person is already registered
+                return 1
+        except:
             # this person is already registered
             return 1
 
