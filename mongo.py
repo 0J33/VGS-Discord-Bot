@@ -1,4 +1,5 @@
 import os
+from unidecode import unidecode
 from dotenv import load_dotenv
 import pathlib
 from pymongo import MongoClient
@@ -80,7 +81,7 @@ def calc_xp_report(discord_id):
     all_tasks = collection.find({})
     tasks = []
     for task in all_tasks:
-        if str(discord_id) in task["discord_ids"]:
+        if discord_id in task["discord_ids"]:
             tasks.append(task)
     xp = 0
     attendance = 0
@@ -101,8 +102,9 @@ async def get_committee_report(committee, client):
     members = collection.find({"committee": committee})
 
     for member in members:
-        report += member["discord_id"] + " " + await get_user_name(member["discord_id"], client) + "\n"
+        report += member["member_id"] + " " + await get_user_name(member["discord_id"], client) + "\n"
         report += calc_xp_report(member["discord_id"])
+    report = unidecode(report)
     return report
 
 def calc_xp_report_leaderboard(discord_id):
@@ -112,7 +114,7 @@ def calc_xp_report_leaderboard(discord_id):
     all_tasks = collection.find({})
     tasks = []
     for task in all_tasks:
-        if str(discord_id) in task["discord_ids"]:
+        if discord_id in task["discord_ids"]:
             tasks.append(task)
     
     for task in tasks:
