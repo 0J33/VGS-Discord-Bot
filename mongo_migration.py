@@ -28,23 +28,23 @@ db = client["vgs"]
 #             line += 4
 #     f.close()
 
-def export_to_json():
-    data = {}
-    for collection in db.list_collection_names():
-        data[collection] = list(db[collection].find({}))
+# def export_to_json():
+#     data = {}
+#     for collection in db.list_collection_names():
+#         data[collection] = list(db[collection].find({}))
         
-    with open('vgs_db.json', 'w') as f:
-        json.dump(data, f, default=json_util.default)
+#     with open('vgs_db.json', 'w') as f:
+#         json.dump(data, f, default=json_util.default)
         
-def import_from_json():
-    with open('vgs_db.json', 'r') as f:
-        data = json.load(f)
-        for collection, docs in data.items():
-            if len(docs) > 0:
-                for doc in docs:
-                    for key, value in doc.items():
-                        if isinstance(value, dict) and "$oid" in value:
-                            doc[key] = json_util.loads(json.dumps(value))
-                    if not db[collection].find_one(doc):
-                        db[collection].insert_one(doc)
+# def import_from_json():
+#     with open('vgs_db.json', 'r') as f:
+#         data = json.load(f)
+#         for collection, docs in data.items():
+#             if len(docs) > 0:
+#                 for doc in docs:
+#                     for key, value in doc.items():
+#                         if isinstance(value, dict) and "$oid" in value:
+#                             doc[key] = json_util.loads(json.dumps(value))
+#                     if not db[collection].find_one(doc):
+#                         db[collection].insert_one(doc)
     
