@@ -1,9 +1,11 @@
+# import the required libraries
 import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ui import Select
 import mongo
 
+# function to handle the select menu
 async def handle_select_add_task(interaction: discord.Interaction, discord_id, xp, justification, committee, attendance):
     
     selected_option = interaction.data['values']
