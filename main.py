@@ -1,3 +1,4 @@
+# import the required libraries
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -7,10 +8,13 @@ from discord.ext import commands
 from discord.ui import Select
 from time import time, ctime
 import pathlib
+
+# import the required files
 import mongo
 import select_handle
 from select_handle import *
 
+# load the .env file
 load_dotenv()
 
 #bot token
@@ -58,7 +62,6 @@ async def on_ready():
 #if message by bot do nothing
 @client.event
 async def on_message(message):
-    
     #if the bot is the author do nothing
     if message.author == client.user:
         return
@@ -112,7 +115,7 @@ async def help(interaction: discord.Interaction):
 
 @client.tree.command(name="my_xp", description="Check your xp")
 async def my_xp(interaction: discord.Interaction):
-
+    
     await interaction.response.defer()
     await asyncio.sleep(1)
 

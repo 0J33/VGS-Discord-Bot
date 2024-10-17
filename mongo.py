@@ -1,3 +1,4 @@
+# import the required libraries
 import os
 from unidecode import unidecode
 from dotenv import load_dotenv
@@ -7,31 +8,39 @@ from tabulate import tabulate
 from PIL import Image, ImageDraw, ImageFont
 from urllib.request import urlopen
 
+# load the environment variables
 load_dotenv()
 
+# get the connection string from the environment variables
 connection_string = os.getenv("connection_string")
-    
+
+# connect to the MongoDB database
 mongo_client = MongoClient(connection_string)
 db = mongo_client["vgs"]
 
+# function to log the user's command
 def log(user, message, datetime):
     collection = db['logs']
     collection.insert_one({'user': user, 'command': message, 'datetime': datetime})
-    
+
+# function to log the user's exception 
 def excp(user, message, exception, datetime):
     collection = db['excp']
     collection.insert_one({'user': user, 'command': message, 'exception': exception, 'datetime': datetime})
 
+# function to find a member by their member ID
 def find_member(member_id):
     collection = db["members"]
     member = collection.find_one({"member_id": member_id})
     return member
 
+# function to find a member by their Discord ID
 def find_member_discord(discord_id):
     collection = db["members"]
     member = collection.find_one({"discord_id": discord_id})
     return member
 
+# function to list all the members in a committee
 async def list_ids(committee_name, client):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
@@ -41,6 +50,7 @@ async def list_ids(committee_name, client):
     members_parsed += "```"
     return members_parsed
 
+# function to register a member
 def register(discord_id, committee):
     collection = db["members"]
     member = collection.find_one({"discord_id": discord_id})
@@ -65,6 +75,7 @@ def register(discord_id, committee):
     collection.insert_one({"member_id": member_id, "committee": committee, "discord_id": discord_id})
     return 0
 
+# function to unregister a member
 def unregister(discord_id):
     member = find_member_discord(discord_id)
     if member is None:
@@ -76,6 +87,7 @@ def unregister(discord_id):
     collection.update_one({"discord_id": discord_id}, {"$set": {"unregistered": True}})
     return 0
 
+# function to calculate the XP report of a member
 def calc_xp_report(discord_id):
     collection = db["xp"]
     all_tasks = collection.find({})
@@ -95,7 +107,8 @@ def calc_xp_report(discord_id):
     report += f"--------\nAttended {attendance} sessions/meetings\n"
     report += f"Total XP is {xp}\n\n\n"
     return report
-        
+
+# function to get calculate the XP report of a committee
 async def get_committee_report(committee, client):
     report = f"=========== {committee} COMMITTEE REPORT ===========\n\n"
     collection = db["members"]
@@ -107,6 +120,7 @@ async def get_committee_report(committee, client):
     report = unidecode(report)
     return report
 
+# function to calculate the XP of a member
 def calc_xp_report_leaderboard(discord_id):
     xp = 0
     
@@ -122,6 +136,7 @@ def calc_xp_report_leaderboard(discord_id):
         
     return xp
 
+# function to get the leaderboard of a committee
 async def get_leaderboard(committee_name, datetime, client):
     collection = db["members"]
     members = collection.find({"committee": committee_name})
@@ -140,6 +155,7 @@ async def get_leaderboard(committee_name, datetime, client):
     
     return res
 
+# function to get the leaderboard of all committees
 async def get_leaderboard_all(datetime, client):
     collection = db["members"]
     members = collection.find({})
@@ -158,6 +174,7 @@ async def get_leaderboard_all(datetime, client):
     
     return res
 
+# function to get the username of a member
 async def get_user_name(discord_id, client):
     user = await client.fetch_user(discord_id)
     username = user.name
@@ -167,6 +184,7 @@ async def get_user_name(discord_id, client):
     else:
         return username
 
+# function to get a new member ID for a member
 def get_new_member_id(member_committee):
     committees_list = {
         "BOARD": "1",
@@ -193,6 +211,7 @@ def get_new_member_id(member_committee):
         return str(int(ids[-1]) + 1)
         # return committees_list[member_committee] + str(ids[-1] + 1).zfill(2)
     
+# function to get all the tasks
 async def get_all_tasks(client):
     collection = db["xp"]
     tasks = collection.find({})
@@ -212,6 +231,7 @@ async def get_all_tasks(client):
         msg += "----------------------------------\n\n"
     return msg
     
+# function to add a task/xp to a member(s)
 def add_task(discord_id, xp, justification, discord_ids, attendance):
     collection = db["xp"]
     try:
@@ -226,6 +246,7 @@ def add_task(discord_id, xp, justification, discord_ids, attendance):
     except:
         return 0
 
+# function to delete a task
 def delete_task(task_id):
     collection = db["xp"]
     if collection.find_one({"id": task_id}) is not None:
@@ -234,11 +255,13 @@ def delete_task(task_id):
     else:
         return 0
     
+# function to get the members of a committee
 def get_members_committee(committee):
     collection = db["members"]
     members = collection.find({"committee": committee})
     return members
 
+# function to create an image of the leaderboard
 def make_img(text, datetime):
     # Create a new image with a white background
     line_height = 50
